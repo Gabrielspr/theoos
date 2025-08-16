@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TheoOS XP (pastel)</title>
+  <style>
+    :root{
+      --xp-blue: #b3d4ff; --xp-green: #c7f4c2; --xp-yellow: #ffe8a3;
+      --xp-pink: #ffd3e2; --xp-lilac: #e6d9ff; --xp-sky: #d7f3ff;
+      --text: #3a3a3a; --shadow: rgba(0,0,0,.12); --glass: rgba(255,255,255,.65);
+      --titlebar: linear-gradient(180deg, #cfe6ff, #b8d8ff);
+      --titlebar-focus: linear-gradient(180deg, #ffd6e8, #ffc2dc);
+      --taskbar: #cae6ff; --taskbar-line: #b9d7ff;
+    }
+    *{box-sizing:border-box;font-family: "Trebuchet MS", system-ui, sans-serif}
+    body,html{height:100%;margin:0;background:#9ed3ff;overflow:hidden;color:var(--text)}
+    
+    #pre-boot{ position:fixed; inset:0; background: #000; z-index: 200; display: grid; place-items: center; }
+    #initButton{ font-size: 1.2rem; padding: 14px 28px; border-radius: 12px; border: 1px solid #444; background: #222; color: #fff; cursor: pointer; transition: background .2s; }
+    #initButton:hover{ background: #333; }
+    
+    .wallpaper{ position:fixed;inset:0;overflow:hidden; background-size: cover; background-position: center; transition: background-image .5s ease-in-out; }
+    .cloud{position:absolute;filter:blur(2px);opacity:.35}
+    .cloud::before{content:"";display:block;width:220px;height:90px;border-radius:60px;background:white;box-shadow: 80px -20px 0 10px white, 150px 0 0 0 white, 40px 10px 0 -10px white; }
+
+    #bootScreen{ position:fixed;inset:0;background:black;z-index:100;display:none;place-items:center; }
+    #bootVideo{ width:100%;height:100%;object-fit:cover; }
+
+    #login{ position:fixed;inset:0;display:none;place-items:center;z-index:5; backdrop-filter:saturate(1.2); }
+    .login-card{ width:min(92vw, 420px); background:var(--glass);box-shadow:0 20px 50px var(--shadow);border-radius:18px;padding:22px; border:1px solid rgba(255,255,255,.8) }
+    .login-title{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+    .login-title .logo{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg, var(--xp-blue), var(--xp-pink));display:grid;place-items:center;box-shadow:0 4px 12px var(--shadow)}
+    .login-title h1{font-size:1.3rem;margin:0}
+    .login-form input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid #dfe9ff;margin-top:6px}
+    .btn{appearance:none;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;box-shadow:0 6px 18px var(--shadow);font-weight:700}
+    .btn-primary{background:linear-gradient(180deg, var(--xp-pink), #ffc2dc);}
+    
+    #desktop{position:fixed;inset:0;display:none}
+    .icons{position:absolute;inset:0; padding:14px; display:grid; grid-template-columns: repeat(auto-fill, 92px); align-content:start; gap:18px}
+    .icon{width:86px;display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none;cursor:pointer}
+    .icon .badge{font-size:11px;padding:4px 8px;border-radius:9px;background:rgba(255,255,255,.7);box-shadow:0 2px 8px var(--shadow)}
+    .icon svg{width:48px;height:48px;filter:drop-shadow(0 4px 6px var(--shadow))}
+
+    .taskbar{position:absolute;left:0;right:0;bottom:0;height:42px;background:var(--taskbar);border-top:1px solid var(--taskbar-line);display:flex;align-items:center;gap:10px;padding:0 8px}
+    .start{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:white;box-shadow:0 6px 14px var(--shadow);cursor:pointer;font-weight:700}
+    
+    .window{position:absolute;min-width:320px;min-height:220px;background:#fff;border-radius:14px;box-shadow:0 18px 50px var(--shadow);border:1px solid #e9f0ff;overflow:hidden; display:flex; flex-direction:column;}
+    .titlebar{height:36px;display:flex;align-items:center;gap:8px;padding:0 10px;background:var(--titlebar);cursor:move;border-bottom:1px solid #d7e7ff; flex-shrink: 0;}
+    .window.focus .titlebar{background:var(--titlebar-focus)}
+    .titlebar .dots{display:flex;gap:6px;margin-right:6px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot.red{background:#ff8aa0} .dot.yellow{background:#ffd47a} .dot.green{background:#9be69b}
+    .win-content{padding:12px; flex-grow:1; overflow:auto; display:flex; flex-direction:column;}
+    .win-actions{margin-left:auto;display:flex;gap:6px}
+    .win-btn{border:0;background:white;border-radius:8px;padding:4px 8px;cursor:pointer}
+
+    /* --- ESTILOS DOS APPS --- */
+    .browser-ui {display:flex; gap:6px; margin-bottom:10px; flex-shrink: 0;}
+    .browser-ui input {flex-grow:1; border: 1px solid #ddd; border-radius:8px; padding:6px 10px;}
+    .browser-ui button {border:0; background: var(--xp-blue); padding:6px 12px; border-radius:8px; cursor:pointer;}
+    .browser-frame {flex-grow:1; border:1px solid #eee; border-radius:10px; background:#fff;}
+    
+    .start-menu{position:absolute;left:8px;bottom:46px;width:280px;background:white;border-radius:14px;box-shadow:0 18px 50px var(--shadow);display:none;overflow:hidden}
+    .start-list{padding:8px;display:grid;gap:6px}
+    .start-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer}
+    .start-item:hover{background:#f6faff}
+  </style>
+</head>
+<body>
+  <section id="pre-boot"> <button id="initButton">✨ Inicializar TheoOS ✨</button> </section>
+  <section id="bootScreen"> <video id="bootVideo" src="boot.mp4" playsinline></video> </section>
+  <div class="wallpaper" id="wallpaper"> <div class="cloud" style="top:12%;left:8%"></div> <div class="cloud" style="top:24%;left:42%;transform:scale(1.2)"></div> <div class="cloud" style="top:54%;left:18%;transform:scale(1.1)"></div> <div class="cloud" style="top:66%;left:68%;transform:scale(0.9)"></div> </div>
+  <section id="login"> <div class="login-card"> <div class="login-title"> <div class="logo">💻</div> <h1>TheoOS XP</h1> </div> <form class="login-form" id="loginForm"> <label for="user">Usuário</label> <input id="user" value="Theo" required /> <div style="height:8px"></div> <label for="pass">Senha</label> <input id="pass" type="password" placeholder="dica: theo" /> <div class="login-actions"> <button class="btn btn-primary" type="submit">Entrar</button> </div> <div class="hint">Bem-vindo, Theo ✨</div> </form> </div> </section>
+
+  <section id="desktop">
+    <div class="icons">
+        <div class="icon" data-open="#win-browser" title="Navegador Fofo">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#84c8ff" stroke-width="1.8"/><path d="M12 3a14 14 0 000 18m-9-9h18" stroke="#84c8ff" stroke-width="1.8"/></svg>
+            <div class="badge">Navegador</div>
+        </div>
+    </div>
+    <div class="taskbar"> <div class="start" id="startBtn"> <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0A8 8 0 004 12zm4.5-1.5l7 3.5-7 3.5v-7z" fill="#ff80a8"/></svg> Iniciar ♡ </div> <div class="tray" style="margin-left:auto;"> <div id="clock" style="background:white;border-radius:10px;padding:6px 10px;box-shadow:0 6px 14px var(--shadow)">--:--</div> </div> </div>
+    <div class="start-menu" id="startMenu"> <div class="start-list"><div class="start-item" data-open="#win-browser">Navegador</div></div> </div>
+
+    <div class="window" id="win-browser" style="width:720px;height:480px;display:none">
+      <div class="titlebar">
+        <div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+        <div class="title">Navegador</div>
+        <div class="win-actions"><button class="win-btn" data-close>X</button></div>
+      </div>
+      <div class="win-content">
+        <div class="browser-ui">
+          <input id="urlInput" placeholder="Cole um link de vídeo do YouTube aqui" />
+          <button id="goBtn">Ir</button>
+        </div>
+        <iframe 
+            id="browserFrame" 
+            class="browser-frame"
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen
+            srcdoc="<div style='font-family: Trebuchet MS; text-align:center; padding-top: 40px; color:#999;'><h2>Bem-vindo! 💖</h2><p>Cole um link do YouTube para começar.</p></div>">
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <audio id="startupSound" src="ini.mp3"></audio>
+  <audio id="sfxPlayer"></audio>
+  
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    // --- SONS ---
+    const sfx = { open: 'open.mp3', close: 'close.mp3', click: 'click.mp3' };
+    const sfxPlayer = $('#sfxPlayer');
+    function playSound(soundName) {
+        if (!sfx[soundName]) return;
+        sfxPlayer.src = sfx[soundName];
+        sfxPlayer.play().catch(e => {});
+    }
+
+    // --- INICIALIZAÇÃO ---
+    $('#initButton').addEventListener('click', () => {
+      $('#pre-boot').style.display = 'none';
+      $('#bootScreen').style.display = 'grid';
+      sfxPlayer.volume = 0.5;
+      $('#bootVideo').play();
+    });
+    $('#bootVideo').addEventListener('ended', () => {
+      $('#bootScreen').style.display = 'none';
+      $('#login').style.display = 'grid';
+      $('#startupSound').play();
+    });
+    $('#loginForm').addEventListener('submit', (e) => { e.preventDefault(); startSystem(); });
+    function startSystem() {
+      $('#login').style.display = 'none';
+      $('#desktop').style.display = 'block';
+    }
+
+    // --- LÓGICA GERAL DO DESKTOP ---
+    setInterval(() => $('#clock').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 1000);
+    const startMenu = $('#startMenu');
+    $('#startBtn').addEventListener('click', (e) => { e.stopPropagation(); startMenu.style.display = 'block'; playSound('open'); });
+    document.addEventListener('click', () => startMenu.style.display = 'none');
+
+    let zTop = 10;
+    function bringToFront(win) { $$('.window').forEach(w => w.classList.remove('focus')); win.classList.add('focus'); win.style.zIndex = ++zTop; }
+
+    function openWin(sel) {
+      const win = $(sel);
+      if (!win) return;
+      win.style.display = 'flex';
+      bringToFront(win);
+      playSound('open');
+    }
+
+    function closeWin(win) {
+        win.style.display = 'none';
+        playSound('close');
+    }
+
+    // --- GERENCIAMENTO DE JANELAS ---
+    let drag = null;
+    function startDrag(e) {
+      if (e.target.closest('.win-actions, .dots')) return;
+      const win = e.currentTarget.parentElement; bringToFront(win);
+      const rect = win.getBoundingClientRect();
+      drag = { win, offX: e.clientX - rect.left, offY: e.clientY - rect.top };
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('mouseup', endDrag);
+    }
+    function onDrag(e) { if (!drag) return; drag.win.style.left = `${e.clientX - drag.offX}px`; drag.win.style.top = `${e.clientY - drag.offY}px`; }
+    function endDrag() { if (!drag) return; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', endDrag); drag = null; }
+
+    $$('.icon, .start-item').forEach(el => {
+      const action = el.classList.contains('icon') ? 'dblclick' : 'click';
+      el.addEventListener(action, (e) => {
+        e.stopPropagation();
+        playSound('click');
+        openWin(el.dataset.open);
+        if (action === 'click') startMenu.style.display = 'none';
+      });
+    });
+    $$('.window').forEach(win => {
+        $('.titlebar', win).addEventListener('mousedown', startDrag);
+        win.addEventListener('mousedown', () => bringToFront(win));
+        $('[data-close]', win).addEventListener('click', () => closeWin(win));
+    });
+
+    // --- NAVEGADOR (VERSÃO SUPER SIMPLIFICADA E CORRIGIDA) ---
+    const urlInput = $('#urlInput');
+    const goBtn = $('#goBtn');
+    const browserFrame = $('#browserFrame');
+
+    function navigate() {
+        let url = urlInput.value.trim();
+        if (!url) return;
+        if (!url.startsWith('http')) { url = 'https://' + url; }
+
+        try {
+            const urlObj = new URL(url);
+            let videoId = null;
+
+            if (urlObj.hostname.includes('youtube.com')) {
+                if (urlObj.pathname.includes('/watch')) {
+                    videoId = urlObj.searchParams.get('v');
+                } else if (urlObj.pathname.includes('/embed/')) {
+                    // Se já for um link de embed, extrai o ID do final do path
+                    const pathParts = urlObj.pathname.split('/');
+                    videoId = pathParts[pathParts.length - 1];
+                }
+            } else if (urlObj.hostname.includes('youtu.be')) {
+                videoId = urlObj.pathname.slice(1);
+            }
+
+            if (videoId) {
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+                browserFrame.srcdoc = ''; 
+                browserFrame.src = embedUrl;
+            } else {
+                browserFrame.src = ''; 
+                browserFrame.srcdoc = `
+                    <div style='font-family: Trebuchet MS; text-align:center; padding: 40px; color:#555;'>
+                        <h2>Conteúdo não suportado</h2>
+                        <p>Este navegador foi feito para vídeos do YouTube.</p>
+                        <p>Por favor, cole o <strong>link completo de um vídeo</strong> para assistir. ❤️</p>
+                    </div>`;
+            }
+        } catch (e) {
+            browserFrame.src = '';
+            browserFrame.srcdoc = `<div style='text-align:center;padding:20px;color:red;'>Endereço inválido.</div>`;
+        }
+    }
+
+    goBtn.addEventListener('click', navigate);
+    urlInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') navigate();
+    });
+  </script>
+</body>
+</html>
