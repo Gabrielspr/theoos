@@ -2,506 +2,878 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TheoOS XP (pastel)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>TheoOS Pro 3.1 (Green Edition)</title>
   <style>
-    :root{
-      --xp-blue: #b3d4ff; --xp-green: #c7f4c2; --xp-yellow: #ffe8a3;
-      --xp-pink: #ffd3e2; --xp-lilac: #e6d9ff; --xp-sky: #d7f3ff;
-      --text: #3a3a3a; --shadow: rgba(0,0,0,.12); --glass: rgba(255,255,255,.65);
-      --titlebar: linear-gradient(180deg, #cfe6ff, #b8d8ff);
-      --titlebar-focus: linear-gradient(180deg, #ffd6e8, #ffc2dc);
-      --taskbar: #cae6ff; --taskbar-line: #b9d7ff;
+    /* --- DESIGN SYSTEM PRO: GREEN EDITION --- */
+    :root {
+      /* Day Theme (Natureza) */
+      --bg-grad: radial-gradient(1200px 700px at 60% 110%, #b8f7c3 0%, #a8e9f0 55%, #c9d8ff 100%); /* Original restaurado como base */
+      --win-bg: rgba(255, 255, 255, 0.85);
+      --text: #2d3436;
+      --accent: #00b894; /* Verde Menta */
+      --glass-border: rgba(255, 255, 255, 0.6);
+      
+      /* Night Theme (Floresta Noturna) */
+      --bg-night-grad: linear-gradient(to bottom, #093028, #237a57);
+      --win-bg-night: rgba(10, 30, 20, 0.9);
+      --text-night: #ecf0f1;
+      
+      /* Specs */
+      --radius: 14px;
+      --shadow: 0 15px 35px rgba(0,0,0,0.2);
+      --font-ui: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
     }
-    *{box-sizing:border-box;font-family: "Trebuchet MS", system-ui, sans-serif}
-    body,html{height:100%;margin:0;background:#9ed3ff;overflow:hidden;color:var(--text)}
-    
-    #pre-boot{ position:fixed; inset:0; background: #000; z-index: 200; display: grid; place-items: center; }
-    #initButton{ font-size: 1.2rem; padding: 14px 28px; border-radius: 12px; border: 1px solid #444; background: #222; color: #fff; cursor: pointer; transition: background .2s; }
-    #initButton:hover{ background: #333; }
-    
-    .wallpaper{ position:fixed;inset:0;overflow:hidden; background-size: cover; background-position: center; transition: background-image .5s ease-in-out; }
-    .cloud{position:absolute;filter:blur(2px);opacity:.35}
-    .cloud::before{content:"";display:block;width:220px;height:90px;border-radius:60px;background:white;box-shadow: 80px -20px 0 10px white, 150px 0 0 0 white, 40px 10px 0 -10px white; }
 
-    #bootScreen{ position:fixed;inset:0;background:black;z-index:100;display:none;place-items:center; }
-    #bootVideo{ width:100%;height:100%;object-fit:cover; }
+    * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+    body, html { margin: 0; height: 100%; overflow: hidden; font-family: var(--font-ui); color: var(--text); }
+    
+    body.night-mode { color: var(--text-night); }
+    body.night-mode #wallpaper { background: var(--bg-night-grad); } 
+    /* Nota: O JS vai sobrescrever o background do wallpaper se o usuário escolher um específico */
+    
+    body.night-mode .window { background: var(--win-bg-night); border-color: #2ecc71; color: var(--text-night); }
+    body.night-mode .titlebar { background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    body.night-mode .taskbar { background: rgba(5, 20, 10, 0.85); border-top: 1px solid #2ecc71; }
+    body.night-mode .start-menu { background: rgba(10, 30, 20, 0.95); color: white; border: 1px solid #2ecc71; }
+    body.night-mode input, body.night-mode textarea { color: white; background: rgba(0,0,0,0.3); border-color: #2ecc71; }
+    body.night-mode .btn { background: #27ae60; }
 
-    /* --- ESTILO DA TELA DE LOGIN KAWAII --- */
-    #login{
-        position:fixed; inset:0; display:none; place-items:center; z-index:5;
-        background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-        background-size: 20px 20px;
-        backdrop-filter: blur(10px);
+    /* --- LAYOUT --- */
+    #wallpaper { 
+        position: fixed; inset: 0; z-index: -1; 
+        background: var(--bg-grad); 
+        transition: background-image 0.5s ease-in-out; 
+        background-size: cover;
+        background-position: center;
     }
-    .login-card {
-        width:min(95vw, 380px);
-        background: #fff;
-        box-shadow: 0 15px 40px rgba(255, 105, 180, 0.2);
-        border-radius:24px;
-        padding: 30px;
-        border: 2px solid var(--xp-pink);
-        text-align: center;
-    }
-    .login-title .logo { font-size: 2.5rem; margin-bottom: 10px; }
-    .login-title h1 { font-size: 1.5rem; margin:0; font-weight: 700; color: var(--xp-pink); }
-    .login-form { margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
-    .login-form input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; text-align: center; font-size: 1rem; }
-    .login-form input:focus { outline: none; border-color: var(--xp-pink); box-shadow: 0 0 0 3px rgba(255, 192, 203, 0.5); }
-    .btn.btn-login { padding: 14px; font-size: 1.1rem; background: var(--xp-pink); color: #fff; }
-    .hint { margin-top: 15px; font-size: 0.8rem; opacity: 0.6; }
+
+    /* Clouds (Do original) */
+    .cloud { position: absolute; filter: blur(3px); opacity: 0.4; animation: floatCloud 60s linear infinite; }
+    .cloud::before { content:""; display:block; width:220px; height:90px; border-radius:60px; background:white; box-shadow: 80px -20px 0 10px white, 150px 0 0 0 white, 40px 10px 0 -10px white; }
+    @keyframes floatCloud { from { transform: translateX(-100vw); } to { transform: translateX(100vw); } }
+
+    /* Boot Screen */
+    #boot-screen { position: fixed; inset: 0; z-index: 20000; background: black; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    #boot-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; display: none; }
+    #power-btn { z-index: 2; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; border: none; background: #00b894; color: white; cursor: pointer; box-shadow: 0 0 20px rgba(0, 184, 148, 0.6); transition: transform 0.2s; display: flex; align-items: center; gap: 10px; }
+    #power-btn:hover { transform: scale(1.05); background: #55efc4; color: #006266; }
+
+    /* Login Ritual */
+    #login-ritual { position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); display: none; place-items: center; transition: opacity 0.8s; color: white; }
+    .heart-core { font-size: 5rem; cursor: pointer; animation: pulse 1.5s infinite; filter: drop-shadow(0 0 20px rgba(0, 255, 127, 0.6)); transition: transform 0.2s; }
+    .heart-core:hover { transform: scale(1.1); }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    .login-input { background: transparent; border: 0; border-bottom: 2px solid rgba(255,255,255,0.5); color: white; font-size: 1.5rem; text-align: center; padding: 10px; outline: none; margin-top: 20px; width: 200px; }
+
+    /* Desktop */
+    #desktop { position: absolute; inset: 0; display: none; }
     
-    #desktop{position:fixed;inset:0;display:none}
-    .icons{position:absolute;inset:0; padding:14px; display:grid; grid-template-columns: repeat(auto-fill, 92px); align-content:start; gap:18px}
-    .icon{width:86px;display:flex;flex-direction:column;align-items:center;gap:6px;user-select:none;cursor:pointer}
-    .icon .badge{font-size:11px;padding:4px 8px;border-radius:9px;background:rgba(255,255,255,.7);box-shadow:0 2px 8px var(--shadow)}
-    .icon svg{width:48px;height:48px;filter:drop-shadow(0 4px 6px var(--shadow))}
+    /* Icons */
+    .icons-area { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 20px; max-width: 600px; }
+    .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); gap: 5px; transition: transform 0.2s; }
+    .app-icon:hover { transform: translateY(-5px); }
+    .app-icon-bg { width: 58px; height: 58px; background: rgba(255,255,255,0.2); border-radius: 16px; display: grid; place-items: center; font-size: 28px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-    .taskbar{position:absolute;left:0;right:0;bottom:0;height:42px;background:var(--taskbar);border-top:1px solid var(--taskbar-line);display:flex;align-items:center;gap:10px;padding:0 8px}
-    .start{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:14px;background:white;box-shadow:0 6px 14px var(--shadow);cursor:pointer;font-weight:700}
+    /* Windows */
+    .window { position: absolute; background: var(--win-bg); border-radius: var(--radius); box-shadow: var(--shadow); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); display: flex; flex-direction: column; min-width: 300px; min-height: 200px; overflow: hidden; opacity: 0; transform: scale(0.9); pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
+    .window.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+    .window.minimized { opacity: 0; transform: translateY(50px) scale(0.8); pointer-events: none; }
+    .titlebar { height: 40px; display: flex; align-items: center; padding: 0 12px; background: rgba(0,0,0,0.03); border-bottom: 1px solid rgba(0,0,0,0.05); cursor: move; justify-content: space-between; }
+    .win-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .win-controls button { width: 12px; height: 12px; border-radius: 50%; border: none; margin-left: 6px; cursor: pointer; }
+    .btn-close { background: #ff5f56; } .btn-min { background: #ffbd2e; } .btn-max { background: #27c93f; }
+    .win-body { flex: 1; overflow: auto; padding: 15px; position: relative; }
+
+    /* Taskbar */
+    .taskbar { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(255,255,255,0.5); backdrop-filter: blur(20px); display: flex; align-items: center; padding: 0 10px; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.4); }
+    .start-btn { background: rgba(255,255,255,0.8); border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #00b894; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; gap:6px; margin-right: 10px;}
+    .start-btn:hover { background: white; }
+    .task-list { display: flex; gap: 6px; overflow-x: auto; flex: 1; }
+    .task-item { padding: 8px 14px; background: rgba(255,255,255,0.4); border-radius: 10px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; border: 1px solid transparent; }
+    .task-item.active { background: white; border-color: var(--accent); color: var(--accent); font-weight: 500; }
+    .clock { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 600; color: #2d3436; }
+    .night-mode .clock { color: white; }
+
+    /* Start Menu */
+    .start-menu { position: absolute; bottom: 60px; left: 10px; width: 280px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border-radius: 16px; padding: 10px; display: none; flex-direction: column; gap: 4px; box-shadow: var(--shadow); z-index: 1001; }
+    .start-item { padding: 12px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; transition: background 0.1s; }
+    .start-item:hover { background: rgba(0,184,148,0.1); color: var(--accent); }
+
+    /* --- APP SPECIFIC STYLES --- */
+    .btn { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; transition: 0.2s; font-weight: 500; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    textarea, input[type="text"] { width: 100%; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 10px; font-family: inherit; background: rgba(255,255,255,0.6); outline: none; }
+    textarea:focus, input[type="text"]:focus { background: white; border-color: var(--accent); }
     
-    #mute-btn {
-        position: absolute; bottom: 52px; right: 14px; width: 40px; height: 40px;
-        border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(5px); box-shadow: 0 4px 12px var(--shadow); cursor: pointer;
-        display: flex; align-items: center; justify-content: center; z-index: 5;
+    /* Game Fix */
+    #game-area { width: 100%; height: 100%; background: linear-gradient(to top, #00b894 0%, #55efc4 100%); border-radius: 8px; position: relative; overflow: hidden; cursor: crosshair; }
+    .game-heart { 
+        position: absolute; 
+        font-size: 32px; /* Bigger hearts */
+        user-select: none; 
+        animation: floatUp 3s linear forwards; 
+        cursor: pointer; 
+        z-index: 10;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     }
-    #mute-btn svg { width: 20px; height: 20px; fill: var(--text); }
+    .game-heart:active { transform: scale(1.5); }
+    @keyframes floatUp { 
+        0% { transform: translateY(0) scale(0.5); opacity: 0; top: 100%; } 
+        10% { opacity: 1; transform: scale(1); } 
+        100% { transform: translateY(-400px) scale(1.2); opacity: 0; top: 100%; } 
+    }
 
-    .window{position:absolute;min-width:320px;min-height:220px;background:#fff;border-radius:14px;box-shadow:0 18px 50px var(--shadow);border:1px solid #e9f0ff;overflow:hidden; display:flex; flex-direction:column;}
-    .titlebar{height:36px;display:flex;align-items:center;gap:8px;padding:0 10px;background:var(--titlebar);cursor:move;border-bottom:1px solid #d7e7ff; flex-shrink: 0;}
-    .window.focus .titlebar{background:var(--titlebar-focus)}
-    .titlebar .dots{display:flex;gap:6px;margin-right:6px}
-    .dot{width:10px;height:10px;border-radius:50%}
-    .dot.red{background:#ff8aa0} .dot.yellow{background:#ffd47a} .dot.green{background:#9be69b}
-    .win-content{padding:12px; flex-grow:1; overflow:auto; display:flex; flex-direction:column;}
-    .win-actions{margin-left:auto;display:flex;gap:6px}
-    .win-btn{border:0;background:white;border-radius:8px;padding:4px 8px;cursor:pointer}
+    /* Paint */
+    .paint-tools { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+    .color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .color-swatch.active { transform: scale(1.2); box-shadow: 0 0 0 2px var(--accent); }
+    #paint-canvas { background: white; border-radius: 8px; cursor: crosshair; touch-action: none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); width: 100%; height: 300px; }
 
-    /* --- ESTILOS DOS APPS --- */
-    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:15px}
-    .gallery figure { margin: 0; }
-    .gallery img{width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;box-shadow:0 6px 16px var(--shadow); margin-bottom: 5px;}
-    .gallery figcaption { font-size: 0.8rem; text-align: center; }
-    .music-player { text-align: center; padding: 10px; }
-    #song-title { font-weight: 700; margin-bottom: 15px; }
-    .music-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top:10px;}
-    .music-controls button { background: none; border: 0; cursor: pointer; padding: 5px; }
-    .music-controls svg { width: 32px; height: 32px; fill: var(--text); }
-    #play-pause-btn svg { width: 42px; height: 42px; }
-    .term{background:#0b1020;color:#e5e7ff;border-radius:10px;padding:10px;font-family:ui-monospace, monospace;height:100%;overflow:auto; flex-grow:1;}
-    .term .prompt{color:#a0d6ff}
-    .term input{width:100%;background:transparent;border:0;color:#fff;outline:none}
-    .achievements{display:grid;gap:10px}
-    .ach{display:flex;align-items:center;gap:10px;background:var(--xp-lilac);padding:10px;border-radius:12px}
-    #reminder-text { font-size: 1.3rem; text-align: center; margin: auto; padding: 20px; }
-    .paint-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;}
-    .color-palette { display: flex; gap: 6px; }
-    .color-box { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 0 1px #ccc; }
-    .color-box.active { box-shadow: 0 0 0 2px var(--xp-blue); }
-    #paint-canvas { flex-grow: 1; border: 1px solid #eee; border-radius: 10px; touch-action: none; }
-    .calculator { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; height: 100%; }
-    .calc-display { grid-column: 1 / -1; background: #f3f4f6; border-radius: 10px; padding: 10px; text-align: right; font-size: 2rem; }
-    .calc-btn { background: var(--xp-sky); border: 0; border-radius: 10px; font-size: 1.2rem; cursor: pointer; }
-    .calc-btn.op { background: var(--xp-yellow); }
-    .calc-btn.eq { background: var(--xp-pink); grid-column: 3 / -1; }
-    .settings-grid { display: grid; gap: 20px; }
-    .settings-group h3 { margin-top: 0; margin-bottom: 10px; }
-    .settings-group .options { display: flex; gap: 10px; flex-wrap: wrap; }
-    .settings-group button { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
-    .settings-group button.active { background: var(--xp-blue); border-color: var(--xp-blue); }
-    .adventure-text { margin: 0 0 20px 0; line-height: 1.6; }
-    .adventure-choices { display: flex; flex-direction: column; gap: 10px; margin-top: auto; }
-    .adventure-choices button { width: 100%; text-align: left; padding: 12px; }
+    /* Calculator */
+    .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; height: 100%; }
+    .calc-display { grid-column: 1/-1; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; text-align: right; font-size: 24px; font-family: monospace; margin-bottom: 5px; color: var(--accent); font-weight: bold; }
+    .calc-btn { border: none; border-radius: 8px; background: rgba(255,255,255,0.6); font-size: 18px; cursor: pointer; transition: 0.1s; }
+    .calc-btn:hover { background: white; }
+    .calc-btn.op { background: rgba(0, 184, 148, 0.1); color: var(--accent); }
+    .calc-btn.eq { background: var(--accent); color: white; }
 
-    .start-menu{position:absolute;left:8px;bottom:46px;width:280px;background:white;border-radius:14px;box-shadow:0 18px 50px var(--shadow);display:none;overflow:hidden}
-    .start-list{padding:8px;display:grid;gap:6px}
-    .start-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer}
-    .start-item:hover{background:#f6faff}
+    /* Gallery */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+    .gallery-item { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+    .gallery-item:hover img { transform: scale(1.1); }
+    
+    /* Terminal */
+    .terminal { font-family: "Fira Code", monospace; font-size: 13px; color: #333; height: 100%; overflow-y: auto; }
+    .night-mode .terminal { color: #55efc4; }
+    .prompt { color: var(--accent); font-weight: bold; margin-right: 5px; }
+
+    /* Zen */
+    .zen-circle { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(from 0deg, #55efc4, #00b894, #55efc4); margin: 40px auto; animation: spinBreath 6s linear infinite; display: grid; place-items: center; color: white; font-size: 12px; box-shadow: 0 0 30px rgba(85, 239, 196, 0.4); }
+    @keyframes spinBreath { 0% { transform: rotate(0deg) scale(0.8); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(0.8); } }
+
   </style>
 </head>
 <body>
-  <section id="pre-boot"> <button id="initButton">✨ Inicializar TheoOS ✨</button> </section>
-  <section id="bootScreen"> <video id="bootVideo" src="boot.mp4" playsinline></video> </section>
-  <div class="wallpaper" id="wallpaper"> <div class="cloud" style="top:12%;left:8%"></div> <div class="cloud" style="top:24%;left:42%;transform:scale(1.2)"></div> <div class="cloud" style="top:54%;left:18%;transform:scale(1.1)"></div> <div class="cloud" style="top:66%;left:68%;transform:scale(0.9)"></div> </div>
-  
-  <section id="login">
-    <div class="login-card">
-      <div class="login-title">
-        <div class="logo">🌸</div>
-        <h1>Bem-vindo ao TheoOS</h1>
-      </div>
-      <form class="login-form" id="loginForm">
-        <input id="user" value="Theo" readonly />
-        <input id="pass" type="password" placeholder="senha (dica: theo)" />
-        <button class="btn btn-login" type="submit">Entrar no Coração</button>
+
+  <!-- ASSETS -->
+  <audio id="startupSound" src="ini.mp3"></audio>
+  <audio id="sfx-open" src="open.mp3"></audio>
+  <audio id="sfx-close" src="close.mp3"></audio>
+  <audio id="sfx-click" src="click.mp3"></audio>
+  <audio id="bgMusicPlayer" loop></audio>
+
+  <!-- BOOT SCREEN -->
+  <div id="boot-screen">
+    <video id="boot-video" src="boot.mp4" playsinline></video>
+    <button id="power-btn" onclick="Boot.start()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+      Ligar TheoOS
+    </button>
+  </div>
+
+  <div id="wallpaper">
+      <div class="cloud" style="top:12%;left:8%"></div> 
+      <div class="cloud" style="top:24%;left:42%;transform:scale(1.2)"></div> 
+      <div class="cloud" style="top:54%;left:18%;transform:scale(1.1)"></div> 
+      <div class="cloud" style="top:66%;left:68%;transform:scale(0.9)"></div>
+  </div>
+
+  <!-- LOGIN RITUAL -->
+  <div id="login-ritual">
+    <div style="text-align: center;">
+      <div class="heart-core" id="heart-btn">🌿</div>
+      <div id="login-msg" style="margin-top: 15px; opacity: 0.8; font-weight: 500;">Bem-vindo ao TheoOS</div>
+      <form id="login-form">
+        <input type="password" class="login-input" id="pass-input" placeholder="senha (theo)" autocomplete="off">
       </form>
-      <div class="hint">Um lugarzinho seguro e fofo só pra você.</div>
     </div>
-  </section>
+  </div>
 
-  <section id="desktop">
-    <div class="icons">
-      </div>
-    <button id="mute-btn" title="Parar/Tocar música de fundo"></button>
+  <!-- DESKTOP -->
+  <div id="desktop">
+    <div class="icons-area" id="desktop-icons"></div>
 
-    <div class="taskbar"> <div class="start" id="startBtn"> <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1016 0A8 8 0 004 12zm4.5-1.5l7 3.5-7 3.5v-7z" fill="#ff80a8"/></svg> Iniciar ♡ </div> <div class="tray" style="margin-left:auto;"> <div id="clock" style="background:white;border-radius:10px;padding:6px 10px;box-shadow:0 6px 14px var(--shadow)">--:--</div> </div> </div>
-    <div class="start-menu" id="startMenu"> <div class="start-list"></div> </div>
+    <!-- JANELAS (APPS) -->
+    <div id="windows-container">
 
-    <div class="window" id="win-notes" style="width:420px;height:360px;display:none">
-        <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Minhas Cartas</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-        <div class="win-content">
-            <p>Escreva aqui suas cartas. 💌</p>
-            <textarea id="notesArea" style="flex-grow:1;border:1px solid #eee;border-radius:8px;padding:10px;"></textarea>
-            <button id="saveNotesBtn" class="btn btn-primary" style="margin-top:10px; width:fit-content;">Salvar</button>
-        </div>
-    </div>
-    <div class="window" id="win-gallery" style="width:560px;height:420px;display:none">
-        <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Fotos e Memórias</div><div class="win-actions"><label class="win-btn" for="photoUploadInput">Adicionar Foto</label><button class="win-btn" data-close>X</button></div></div>
-        <div class="win-content">
-            <input type="file" id="photoUploadInput" accept="image/*" multiple style="display:none" />
-            <div class="gallery" id="gallery"></div>
-        </div>
-    </div>
-    <div class="window" id="win-music" style="width:340px;height:240px;display:none">
-        <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Música</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-        <div class="win-content music-player">
-            <label for="musicUploadInput" class="btn btn-primary">Adicionar Músicas</label>
-            <input type="file" id="musicUploadInput" accept="audio/*" multiple style="display:none" />
-            <p style="margin-top:15px;">Tocando no App:</p>
-            <h3 id="song-title">-- Nenhuma --</h3>
-            <div class="music-controls">
-                <button id="prev-btn"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-                <button id="play-pause-btn"></button>
-                <button id="next-btn"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-3.5 6l-8.5 6V6z"/></svg></button>
+        <!-- 1. CHANGELOG -->
+        <div class="window" id="win-changelog" style="width: 450px; height: 500px; left: 50px; top: 50px;">
+            <div class="titlebar"><div class="win-title">📜 Changelog 3.1</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-changelog')"></button></div></div>
+            <div class="win-body">
+                <h3>TheoOS Pro 3.1 — Green Edition</h3>
+                <ul style="padding-left: 20px; line-height: 1.6;">
+                    <li><b>🌿 Tema Verde:</b> Interface totalmente renovada com cores da natureza.</li>
+                    <li><b>💾 Conteúdo Original:</b> Músicas, história e textos restaurados.</li>
+                    <li><b>🎬 Boot Screen:</b> Adicionado suporte a vídeo de boot (boot.mp4).</li>
+                    <li><b>🎮 Jogo Corrigido:</b> Catch Hearts agora funciona perfeitamente.</li>
+                </ul>
             </div>
         </div>
-    </div>
-    <div class="window" id="win-terminal" style="width:520px;height:340px;display:none">
-      <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Terminal Fofo</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-      <div class="win-content"><div class="term" id="term"><div>Bem-vindo ao <b>TheoShell 1.0</b> — digite <span class="prompt">ajuda</span>.</div><input id="termInput" autocomplete="off" /></div></div>
-    </div>
-    <div class="window" id="win-game" style="width:420px;height:320px;display:none">
-      <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Jogo: Colete Corações</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-      <div class="win-content"><p>Faça 10 pontos para um segredo 💖</p><div id="gameArea" style="position:relative;height:100%;background:var(--xp-sky);border-radius:12px;overflow:hidden"></div><div style="margin-top:8px">Pontuação: <b id="score">0</b> / 10</div></div>
-    </div>
-    <div class="window" id="win-achv" style="width:420px;height:300px;display:none">
-      <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Conquistas do Amor</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-      <div class="win-content achievements" id="achv"><div class="ach">🏅 Primeira risada</div><div class="ach">📸 Selfie da semana</div><div class="ach">🫶 Abraço de 10s</div></div>
-    </div>
-    <div class="window" id="win-paint" style="width:500px;height:400px;display:none"> <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Desenho</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div> <div class="win-content"><div class="paint-toolbar"><div id="color-palette" class="color-palette"></div><button id="clear-canvas-btn" class="win-btn" style="margin-left:auto">Limpar</button></div><canvas id="paint-canvas"></canvas></div> </div>
-    <div class="window" id="win-reminder" style="width:380px;height:260px;display:none"> <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Lembrete</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div> <div class="win-content"><p id="reminder-text"></p></div> </div>
-    <div class="window" id="win-calculator" style="width:320px;height:400px;display:none"> <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Calculadora</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div> <div class="win-content"><div class="calculator"><div id="calc-display" class="calc-display">0</div></div></div> </div>
-    <div class="window" id="win-settings" style="width:420px;height:320px;display:none"> <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Configurações</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div> <div class="win-content settings-grid"><div class="settings-group"><h3>Tema de Cores</h3><div id="theme-options" class="options"></div></div><div class="settings-group"><h3>Papel de Parede</h3><div id="wallpaper-options" class="options"></div></div></div> </div>
-    <div class="window" id="win-adventure" style="width:480px;height:360px;display:none">
-      <div class="titlebar"><div class="dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div><div class="title">Pequenas Aventuras</div><div class="win-actions"><button class="win-btn" data-close>X</button></div></div>
-      <div class="win-content">
-        <p id="adventure-text" class="adventure-text"></p>
-        <div id="adventure-choices" class="adventure-choices"></div>
-      </div>
-    </div>
-  </section>
 
-  <audio id="startupSound" src="ini.mp3"></audio>
-  <audio id="appMusicPlayer"></audio>
-  <audio id="backgroundMusicPlayer"></audio>
-  <audio id="sfxPlayer"></audio>
-  
+        <!-- 2. TERMINAL -->
+        <div class="window" id="win-term" style="width: 500px; height: 350px;">
+            <div class="titlebar"><div class="win-title">💬 TheoShell</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-term')"></button></div></div>
+            <div class="win-body terminal" id="term-out" onclick="document.getElementById('term-in').focus()">
+                <div>Bem-vindo ao <b>TheoShell 1.0</b> — digite <b style="color:var(--accent)">'ajuda'</b>.</div>
+                <div style="margin-top:10px; display:flex;"><span class="prompt">➜</span><input id="term-in" style="background:transparent; border:none; padding:0; color:inherit; width:100%; outline:none;" autocomplete="off"></div>
+            </div>
+        </div>
+
+        <!-- 3. CARTAS (NOTES) -->
+        <div class="window" id="win-notes" style="width: 350px; height: 400px;">
+            <div class="titlebar"><div class="win-title">📝 Minhas Cartas</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-notes')"></button></div></div>
+            <div class="win-body" style="display:flex; flex-direction:column;">
+                <p>Escreva aqui suas cartas. 💌</p>
+                <textarea id="notes-area" style="flex:1; resize:none;" placeholder="Escreva seus pensamentos..."></textarea>
+                <button onclick="alert('Carta salva! ❤️')" class="btn" style="margin-top:10px;width:fit-content">Salvar</button>
+            </div>
+        </div>
+
+        <!-- 4. GALERIA -->
+        <div class="window" id="win-gallery" style="width: 400px; height: 450px;">
+            <div class="titlebar"><div class="win-title">📸 Fotos e Memórias</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-gallery')"></button></div></div>
+            <div class="win-body">
+                <label for="img-upload" class="btn" style="display:block; text-align:center; margin-bottom:10px;">Adicionar Foto</label>
+                <input type="file" id="img-upload" accept="image/*" style="display:none">
+                <div class="gallery-grid" id="gallery-grid"></div>
+            </div>
+        </div>
+
+        <!-- 5. DESENHO (PAINT) -->
+        <div class="window" id="win-paint" style="width: 500px; height: 450px;">
+            <div class="titlebar"><div class="win-title">🎨 Desenho</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-paint')"></button></div></div>
+            <div class="win-body">
+                <div class="paint-tools" id="paint-colors"></div>
+                <button class="btn" onclick="clearPaint()" style="font-size:12px; padding:4px 8px; margin-bottom:5px;">Limpar</button>
+                <canvas id="paint-canvas" width="460" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- 6. CALCULADORA -->
+        <div class="window" id="win-calc" style="width: 260px; height: 350px;">
+            <div class="titlebar"><div class="win-title">🧮 Calculadora</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-calc')"></button></div></div>
+            <div class="win-body">
+                <div class="calc-grid" id="calc-keys">
+                    <div class="calc-display" id="calc-disp">0</div>
+                    <!-- Keys generated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. JOGO -->
+        <div class="window" id="win-game" style="width: 400px; height: 350px;">
+            <div class="titlebar"><div class="win-title">🎮 Colete Corações</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-game')"></button></div></div>
+            <div class="win-body" style="padding:0;">
+                <div style="position:absolute; top:10px; left:10px; z-index:20; color:white; font-weight:bold; background:rgba(0,0,0,0.3); padding:4px 8px; border-radius:8px;">Pontuação: <span id="game-score">0</span> / 10</div>
+                <div id="game-area" onclick="GameApp.clickBg()"></div>
+            </div>
+        </div>
+
+        <!-- 8. MÚSICA -->
+        <div class="window" id="win-music" style="width: 320px; height: 260px;">
+            <div class="titlebar"><div class="win-title">🎵 Música</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-music')"></button></div></div>
+            <div class="win-body" style="text-align:center;">
+                <label for="music-upload" class="btn" style="font-size:12px;">Adicionar Músicas</label>
+                <input type="file" id="music-upload" accept="audio/*" style="display:none" multiple>
+                
+                <p style="margin-top:15px; font-size:0.9rem">Tocando:</p>
+                <h3 id="music-status" style="margin:5px 0 15px 0;">-- Nenhuma --</h3>
+                
+                <div style="display:flex; justify-content:center; gap:15px; margin-bottom:15px;">
+                    <button class="btn" onclick="MusicApp.prev()">⏮</button>
+                    <button class="btn" onclick="MusicApp.playPause()">⏯</button>
+                    <button class="btn" onclick="MusicApp.next()">⏭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. AVENTURA (RPG) -->
+        <div class="window" id="win-adventure" style="width: 500px; height: 400px;">
+            <div class="titlebar"><div class="win-title">⚔️ Pequenas Aventuras</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-adventure')"></button></div></div>
+            <div class="win-body" style="display:flex; flex-direction:column;">
+                <div id="adv-text" style="flex:1; font-size:16px; line-height:1.6; padding:10px;"></div>
+                <div id="adv-opts" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;"></div>
+            </div>
+        </div>
+
+        <!-- 10. ZEN -->
+        <div class="window" id="win-zen" style="width: 300px; height: 350px;">
+            <div class="titlebar"><div class="win-title">🧘 Zen</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-zen')"></button></div></div>
+            <div class="win-body" style="text-align:center;">
+                <div class="zen-circle">Inspire</div>
+                <p>Sincronize sua respiração.<br>Relaxe.</p>
+            </div>
+        </div>
+
+         <!-- 11. ORÁCULO -->
+         <div class="window" id="win-oracle" style="width: 300px; height: 250px;">
+            <div class="titlebar"><div class="win-title">🔮 Oráculo</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-oracle')"></button></div></div>
+            <div class="win-body" style="text-align:center; display:flex; flex-direction:column; justify-content:center;">
+                <div id="oracle-res" style="font-size:18px; font-weight:bold; margin-bottom:15px;">O que deseja saber?</div>
+                <button class="btn" onclick="OracleApp.ask()">Revelar Destino</button>
+            </div>
+        </div>
+
+        <!-- 12. DIÁRIO DE SONHOS -->
+        <div class="window" id="win-dreams" style="width: 350px; height: 400px;">
+            <div class="titlebar"><div class="win-title">🌙 Sonhos</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-dreams')"></button></div></div>
+            <div class="win-body">
+                 <textarea id="dreams-area" style="height:100%; background:rgba(0, 184, 148, 0.1); color:var(--text);" placeholder="Descreva seu sonho..."></textarea>
+            </div>
+        </div>
+        
+        <!-- 13. CONFIGURAÇÕES -->
+        <div class="window" id="win-settings" style="width: 350px; height: 300px;">
+            <div class="titlebar"><div class="win-title">⚙️ Ajustes</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-settings')"></button></div></div>
+            <div class="win-body">
+                <p style="font-weight:bold; margin-bottom:5px;">Tema:</p>
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button class="btn" onclick="UI.setTheme('day')">☀️ Dia</button>
+                    <button class="btn" style="background:#2c3e50" onclick="UI.setTheme('night')">🌙 Noite</button>
+                </div>
+
+                <p style="font-weight:bold; margin-bottom:5px;">Papel de Parede:</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn" onclick="UI.setWallpaper('verde_azul')">Verde e Azul (Original)</button>
+                    <button class="btn" style="background:#ff9ff3; color:#2d3436;" onclick="UI.setWallpaper('amor_rosa')">Amor Rosa</button>
+                    <button class="btn" style="background:#00b894" onclick="UI.setWallpaper('default')">Green Pro</button>
+                </div>
+                
+                <p style="margin-top:20px; font-size:12px; color:gray;">TheoOS v3.1 Pro<br>Heart Kernel Active</p>
+            </div>
+        </div>
+        
+        <!-- 14. LEMBRETE -->
+        <div class="window" id="win-reminder" style="width: 300px; height: 200px;">
+            <div class="titlebar"><div class="win-title">📌 Lembrete</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-reminder')"></button></div></div>
+            <div class="win-body" style="display:grid; place-items:center; text-align:center;">
+                <h3 id="reminder-txt">...</h3>
+                <button class="btn" onclick="ReminderApp.new()">Outro</button>
+            </div>
+        </div>
+        
+        <!-- 15. CONQUISTAS -->
+        <div class="window" id="win-achv" style="width: 320px; height: 300px;">
+            <div class="titlebar"><div class="win-title">🏆 Conquistas do Amor</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-achv')"></button></div></div>
+            <div class="win-body">
+                <ul id="achv-list" style="padding-left:20px;">
+                    <li>🏅 Primeira risada</li>
+                    <li>📸 Selfie da semana</li>
+                    <li>🫶 Abraço de 10s</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TASKBAR -->
+    <div class="taskbar">
+        <button class="start-btn" onclick="UI.toggleStart()">❖ Iniciar</button>
+        <div class="task-list" id="task-list"></div>
+        <div class="clock" id="clock">00:00</div>
+    </div>
+    
+    <div class="start-menu" id="start-menu">
+        <div style="padding:10px; font-weight:bold; border-bottom:1px solid #eee; color: var(--accent);">Olá, Theo 🌿</div>
+        <div id="start-items"></div>
+    </div>
+
+  </div>
+
   <script>
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    /* --- UTILS --- */
+    const $ = s => document.querySelector(s);
+    const $$ = s => document.querySelectorAll(s);
+    const playSound = (id) => { const el = $(id); if(el) { el.currentTime=0; el.play().catch(()=>{}); }};
 
-    // --- SONS DO SISTEMA ---
-    const sfx = { open: 'open.mp3', close: 'close.mp3', click: 'click.mp3' };
-    const sfxPlayer = $('#sfxPlayer');
-    function playSound(soundName) {
-        if (!sfx[soundName]) return;
-        sfxPlayer.src = sfx[soundName];
-        sfxPlayer.play().catch(e => {});
-    }
-
-    // --- INICIALIZAÇÃO ---
-    const appMusicPlayer = $('#appMusicPlayer');
-    const backgroundMusicPlayer = $('#backgroundMusicPlayer');
-    const muteBtn = $('#mute-btn');
-    const soundOnIcon = `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>`;
-    const soundOffIcon = `<svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>`;
-
-    $('#initButton').addEventListener('click', () => {
-      $('#pre-boot').style.display = 'none';
-      $('#bootScreen').style.display = 'grid';
-      sfxPlayer.volume = 0.5;
-      appMusicPlayer.volume = 0.5;
-      backgroundMusicPlayer.volume = 0.15; // Volume da música de fundo
-      $('#bootVideo').play();
-    });
-    $('#bootVideo').addEventListener('ended', () => {
-      $('#bootScreen').style.display = 'none';
-      $('#login').style.display = 'grid';
-      $('#startupSound').play();
-    });
-    $('#loginForm').addEventListener('submit', (e) => { e.preventDefault(); startSystem(); });
-    
-    function startSystem() {
-      $('#login').style.display = 'none';
-      $('#desktop').style.display = 'block';
-      playNextBgTrack(); // Música de fundo começa após o login
-      const isMuted = localStorage.getItem('theoos-bg-music-muted') === 'true';
-      backgroundMusicPlayer.muted = isMuted;
-      updateMuteButton();
-      loadNotes();
-      renderGallery();
-      loadSettings();
-    }
-
-    // --- MÚSICA DE FUNDO E BOTÃO DE MUTE ---
-    const backgroundPlaylist = ['musga_1.mp3', 'musga_2.mp3'];
-    let currentBgTrackIndex = 0;
-    function playNextBgTrack() {
-        if (backgroundPlaylist.length === 0) return;
-        backgroundMusicPlayer.src = backgroundPlaylist[currentBgTrackIndex];
-        backgroundMusicPlayer.play();
-        currentBgTrackIndex = (currentBgTrackIndex + 1) % backgroundPlaylist.length;
-    }
-    backgroundMusicPlayer.addEventListener('ended', playNextBgTrack);
-
-    function updateMuteButton() { muteBtn.innerHTML = backgroundMusicPlayer.muted ? soundOffIcon : soundOnIcon; }
-    muteBtn.addEventListener('click', () => {
-        backgroundMusicPlayer.muted = !backgroundMusicPlayer.muted;
-        localStorage.setItem('theoos-bg-music-muted', backgroundMusicPlayer.muted);
-        updateMuteButton();
-    });
-
-    // --- LÓGICA GERAL DO DESKTOP ---
-    setInterval(() => $('#clock').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 1000);
-    const startMenu = $('#startMenu');
-    $('#startBtn').addEventListener('click', (e) => { e.stopPropagation(); startMenu.style.display = 'block'; playSound('open'); });
-    document.addEventListener('click', () => startMenu.style.display = 'none');
-
-    let zTop = 10;
-    function bringToFront(win) { $$('.window').forEach(w => w.classList.remove('focus')); win.classList.add('focus'); win.style.zIndex = ++zTop; }
-
-    function openWin(sel) {
-      const win = $(sel);
-      if (!win) return;
-      win.style.display = 'flex';
-      bringToFront(win);
-      playSound('open');
-      if (sel === '#win-reminder') showRandomReminder();
-      if (sel === '#win-paint') initPaint();
-      if (sel === '#win-adventure') renderScene('start');
-    }
-
-    function closeWin(win) {
-        win.style.display = 'none';
-        playSound('close');
-    }
-
-    // --- GERENCIAMENTO DE JANELAS ---
-    let drag = null;
-    function startDrag(e) {
-      if (e.target.closest('.win-actions, .dots')) return;
-      const win = e.currentTarget.parentElement; bringToFront(win);
-      const rect = win.getBoundingClientRect();
-      drag = { win, offX: e.clientX - rect.left, offY: e.clientY - rect.top };
-      document.addEventListener('mousemove', onDrag);
-      document.addEventListener('mouseup', endDrag);
-    }
-    function onDrag(e) { if (!drag) return; win.style.left = `${e.clientX - drag.offX}px`; win.style.top = `${e.clientY - drag.offY}px`; }
-    function endDrag() { if (!drag) return; document.removeEventListener('mousemove', onDrag); document.removeEventListener('mouseup', endDrag); drag = null; }
-
-    // --- APLICATIVOS (CRIAÇÃO DE ÍCONES E LÓGICA) ---
-    const appData = [
-      { name: 'Cartas', id: '#win-notes' }, { name: 'Fotos', id: '#win-gallery' },
-      { name: 'Música', id: '#win-music' }, { name: 'Desenho', id: '#win-paint' },
-      { name: 'Lembrete', id: '#win-reminder' }, { name: 'Calculadora', id: '#win-calculator' },
-      { name: 'Terminal', id: '#win-terminal' }, { name: 'Conquistas', id: '#win-achv' },
-      { name: 'Jogo', id: '#win-game' }, { name: 'Configurações', id: '#win-settings' },
-      { name: 'Aventura', id: '#win-adventure' }
+    /* --- DATA & KERNEL --- */
+    const Apps = [
+        { id: 'win-changelog', name: 'Changelog', icon: '📜' },
+        { id: 'win-notes', name: 'Cartas', icon: '📝' },
+        { id: 'win-gallery', name: 'Fotos', icon: '📸' },
+        { id: 'win-music', name: 'Música', icon: '🎵' },
+        { id: 'win-paint', name: 'Desenho', icon: '🎨' },
+        { id: 'win-calc', name: 'Calculadora', icon: '🧮' },
+        { id: 'win-term', name: 'Terminal', icon: '💬' },
+        { id: 'win-game', name: 'Jogo', icon: '🎮' },
+        { id: 'win-adventure', name: 'Aventura', icon: '⚔️' },
+        { id: 'win-zen', name: 'Zen', icon: '🧘' },
+        { id: 'win-oracle', name: 'Oráculo', icon: '🔮' },
+        { id: 'win-dreams', name: 'Sonhos', icon: '🌙' },
+        { id: 'win-reminder', name: 'Lembrete', icon: '📌' },
+        { id: 'win-achv', name: 'Conquistas', icon: '🏆' },
+        { id: 'win-settings', name: 'Ajustes', icon: '⚙️' }
     ];
-    const iconsContainer = $('.icons'), startList = $('.start-list');
-    appData.forEach(app => {
-        const iconHtml = `<div class="icon" data-open="${app.id}" title="${app.name}"><svg viewBox="0 0 24 24" fill="none">${{
-            '#win-notes': '<rect x="3" y="4" width="18" height="16" rx="3" fill="#ffd3e2"/><path d="M4 7l8 6 8-6" stroke="#ff7aa5" stroke-width="1.6"/>',
-            '#win-gallery': '<rect x="3" y="5" width="18" height="14" rx="3" fill="#bfe9ff"/><circle cx="9" cy="10" r="2" fill="#84c8ff"/><path d="M5 16l4-3 3 2 3-2 4 3" stroke="#3ba9ff" stroke-width="1.6"/>',
-            '#win-music': '<circle cx="12" cy="12" r="8" fill="#ffd3e2"/><path d="M10 8.5v7l6-3.5z" fill="#ff7aa5"/>',
-            '#win-paint': '<path d="M12 3a9 9 0 00-9 9c0 4.2 2.8 7.8 6.8 8.8l1.2.3V12h-3v-2h3V3z" fill="#ffe8a3"/><path d="M12 3a9 9 0 019 9c0 4.2-2.8 7.8-6.8 8.8l-1.2.3V12h3v-2h-3V3z" fill="#b3d4ff"/>',
-            '#win-reminder': '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54z" fill="#ff8aa0"/>',
-            '#win-calculator': '<rect x="4" y="3" width="16" height="18" rx="3" fill="#e6d9ff"/><rect x="7" y="8" width="10" height="2" rx="1" fill="#9c79ff"/><rect x="7" y="12" width="2" height="2" rx="1" fill="#9c79ff"/><rect x="11" y="12" width="2" height="2" rx="1" fill="#9c79ff"/>',
-            '#win-settings': '<circle cx="12" cy="12" r="3" fill="#aaa"/><path d="M19.4 12.5a7.4 7.4 0 11-14.8 0 7.4 7.4 0 0114.8 0z" stroke="#aaa" stroke-width="1.8"/>',
-            '#win-terminal': '<rect x="3" y="4" width="18" height="16" rx="3" fill="#e6d9ff"/><path d="M7 9l3 3-3 3" stroke="#9c79ff" stroke-width="1.6"/><path d="M12 15h5" stroke="#9c79ff" stroke-width="1.6"/>',
-            '#win-achv': '<path d="M12 3l2.2 4.5 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.2l5-.7z" fill="#ffe8a3"/>',
-            '#win-game': '<rect x="2" y="6" width="20" height="12" rx="6" fill="#c7f4c2"/><circle cx="9" cy="12" r="1.8" fill="#77d173"/><rect x="14" y="10.2" width="1.4" height="3.6" rx=".7" fill="#77d173"/><rect x="12.6" y="11.4" width="3.6" height="1.4" rx=".7" fill="#77d173"/>',
-            '#win-adventure': '<path d="M9 3l-1 2H4v13h16V5h-4l-1-2z" fill="#ffe8a3"/><path d="M4 10h16m-8 0v8m-3-3l3 3 3-3" stroke="#c7a14d" stroke-width="1.6" stroke-linecap="round"/>'
-        }[app.id]}</svg><div class="badge">${app.name}</div></div>`;
-        iconsContainer.innerHTML += iconHtml;
-        startList.innerHTML += `<div class="start-item" data-open="${app.id}">${app.name}</div>`;
-    });
 
-    $$('.icon, .start-item').forEach(el => {
-      const action = el.classList.contains('icon') ? 'dblclick' : 'click';
-      el.addEventListener(action, (e) => {
-        e.stopPropagation();
-        playSound('click');
-        openWin(el.dataset.open);
-        if (action === 'click') startMenu.style.display = 'none';
-      });
-    });
-    $$('.window').forEach(win => {
-        $('.titlebar', win).addEventListener('mousedown', startDrag);
-        win.addEventListener('mousedown', () => bringToFront(win));
-        $('[data-close]', win).addEventListener('click', () => closeWin(win));
-    });
-    
-    // --- LÓGICA ESPECÍFICA DOS APLICATIVOS ---
+    const Kernel = {
+        data: { boots: 0, theme: 'auto', wallpaper: 'default', notes: '', dreams: '', photos: [] },
+        init() {
+            const saved = localStorage.getItem('theoos_pro_31');
+            if (saved) this.data = { ...this.data, ...JSON.parse(saved) };
+            
+            // Tenta importar fotos antigas se existirem
+            const oldPhotos = localStorage.getItem('theoos-photos');
+            if(oldPhotos && this.data.photos.length === 0) {
+                 this.data.photos = JSON.parse(oldPhotos).map(p => p.src);
+            }
 
-    // Cartas
-    const notesArea = $('#notesArea');
-    function saveNotes() { localStorage.setItem('theoos-notes', notesArea.value); alert('Carta salva! ❤️'); }
-    function loadNotes() { notesArea.value = localStorage.getItem('theoos-notes') || 'Escreva algo fofo para o Theo aqui...'; }
-    $('#saveNotesBtn')?.addEventListener('click', saveNotes);
+            this.data.boots++;
+            this.save();
+            this.applyTheme();
+            this.applyWallpaper();
+        },
+        save() { localStorage.setItem('theoos_pro_31', JSON.stringify(this.data)); },
+        applyTheme() {
+            const h = new Date().getHours();
+            const isNight = this.data.theme === 'night' || (this.data.theme === 'auto' && (h >= 22 || h < 5));
+            document.body.classList.toggle('night-mode', isNight);
+        },
+        applyWallpaper() {
+             const wp = this.data.wallpaper;
+             const el = $('#wallpaper');
+             if(wp === 'verde_azul') el.style.background = 'radial-gradient(1200px 700px at 60% 110%, #b8f7c3 0%, #a8e9f0 55%, #c9d8ff 100%)';
+             else if(wp === 'amor_rosa') el.style.background = 'url("wallpaper2.jpg") center/cover';
+             else el.style.background = 'var(--bg-grad)';
+        }
+    };
 
-    // Fotos com Legendas
-    const photoUploadInput = $('#photoUploadInput'), galleryContainer = $('#gallery');
-    let photos = JSON.parse(localStorage.getItem('theoos-photos')) || [];
-    function savePhotos() { localStorage.setItem('theoos-photos', JSON.stringify(photos)); }
-    function renderGallery() {
-        galleryContainer.innerHTML = '';
-        if (photos.length === 0) { galleryContainer.innerHTML = '<p style="text-align:center; color:#999;">Adicione fotos!</p>'; }
-        photos.forEach(photo => { const fig = document.createElement('figure'); fig.innerHTML = `<img src="${photo.src}" alt="${photo.caption}"><figcaption>${photo.caption}</figcaption>`; galleryContainer.appendChild(fig); });
-    }
-    photoUploadInput?.addEventListener('change', (e) => {
-        for (const file of e.target.files) {
-            const caption = prompt(`Digite uma legenda para "${file.name}":`);
-            if (caption === null) continue;
+    /* --- BOOT LOGIC --- */
+    const Boot = {
+        start() {
+            const btn = $('#power-btn');
+            const video = $('#boot-video');
+            btn.style.display = 'none';
+            video.style.display = 'block';
+            
+            video.play().then(() => {
+                video.onended = () => this.end();
+            }).catch(() => {
+                // Se o vídeo falhar, vai direto para o login
+                setTimeout(() => this.end(), 1000);
+            });
+        },
+        end() {
+            const screen = $('#boot-screen');
+            screen.style.transition = 'opacity 1s';
+            screen.style.opacity = '0';
+            setTimeout(() => {
+                screen.style.display = 'none';
+                $('#login-ritual').style.display = 'grid'; 
+                playSound('#startupSound');
+                MusicApp.startBackground(); // Inicia música de fundo
+            }, 1000);
+        }
+    };
+
+    /* --- UI ENGINE --- */
+    const UI = {
+        zTop: 100,
+        
+        init() {
+            this.renderIcons();
+            this.renderStart();
+            setInterval(() => $('#clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 1000);
+            this.dragLogic();
+        },
+
+        renderIcons() {
+            const area = $('#desktop-icons');
+            Apps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'app-icon';
+                div.innerHTML = `<div class="app-icon-bg">${app.icon}</div><span>${app.name}</span>`;
+                div.onclick = () => this.openWin(app.id);
+                area.appendChild(div);
+            });
+        },
+
+        renderStart() {
+            const menu = $('#start-items');
+            Apps.forEach(app => {
+                const div = document.createElement('div');
+                div.className = 'start-item';
+                div.innerHTML = `<span>${app.icon}</span> ${app.name}`;
+                div.onclick = () => { this.openWin(app.id); this.toggleStart(); };
+                menu.appendChild(div);
+            });
+        },
+
+        openWin(id) {
+            const win = $('#' + id);
+            if (!win) return;
+            win.style.display = 'flex';
+            setTimeout(() => { win.classList.add('open'); win.classList.remove('minimized'); }, 10);
+            this.focusWin(win);
+            this.updateTaskbar();
+            playSound('#sfx-open');
+            
+            if(id === 'win-game') GameApp.start();
+            if(id === 'win-adventure') AdvApp.render('start');
+            if(id === 'win-paint') PaintApp.init();
+            if(id === 'win-calc') CalcApp.init();
+            if(id === 'win-gallery') GalleryApp.render();
+            if(id === 'win-reminder') ReminderApp.new();
+        },
+
+        closeWin(id) {
+            const win = $('#' + id);
+            win.classList.remove('open');
+            setTimeout(() => { win.style.display = 'none'; this.updateTaskbar(); }, 200);
+            playSound('#sfx-close');
+            if(id === 'win-game') GameApp.stop();
+        },
+
+        focusWin(win) {
+            this.zTop++;
+            win.style.zIndex = this.zTop;
+            this.updateTaskbar();
+        },
+
+        updateTaskbar() {
+            const bar = $('#task-list');
+            bar.innerHTML = '';
+            $$('.window').forEach(win => {
+                if (win.style.display === 'none') return;
+                const app = Apps.find(a => a.id === win.id);
+                const item = document.createElement('div');
+                item.className = `task-item ${win.style.zIndex == this.zTop && !win.classList.contains('minimized') ? 'active' : ''}`;
+                item.innerText = app ? app.name : 'Janela';
+                item.onclick = () => {
+                    if (win.classList.contains('minimized') || win.style.zIndex != this.zTop) {
+                        win.classList.remove('minimized');
+                        this.focusWin(win);
+                    } else {
+                        win.classList.add('minimized');
+                        item.classList.remove('active');
+                    }
+                };
+                bar.appendChild(item);
+            });
+        },
+
+        toggleStart() {
+            const menu = $('#start-menu');
+            if(menu.style.display === 'flex') {
+                 menu.style.display = 'none';
+            } else {
+                 menu.style.display = 'flex';
+                 playSound('#sfx-open');
+            }
+        },
+
+        setTheme(mode) {
+            Kernel.data.theme = mode;
+            Kernel.save();
+            Kernel.applyTheme();
+        },
+
+        setWallpaper(wp) {
+            Kernel.data.wallpaper = wp;
+            Kernel.save();
+            Kernel.applyWallpaper();
+        },
+
+        dragLogic() {
+            let dragged = null, offX = 0, offY = 0;
+            document.addEventListener('mousedown', e => {
+                const titlebar = e.target.closest('.titlebar');
+                if (titlebar) {
+                    const win = titlebar.parentElement;
+                    this.focusWin(win);
+                    dragged = win;
+                    const rect = win.getBoundingClientRect();
+                    offX = e.clientX - rect.left;
+                    offY = e.clientY - rect.top;
+                } else if (!e.target.closest('.start-menu') && !e.target.closest('.start-btn')) {
+                    $('#start-menu').style.display = 'none';
+                }
+            });
+            document.addEventListener('mousemove', e => {
+                if (dragged) {
+                    dragged.style.left = (e.clientX - offX) + 'px';
+                    dragged.style.top = (e.clientY - offY) + 'px';
+                }
+            });
+            document.addEventListener('mouseup', () => dragged = null);
+        }
+    };
+
+    /* --- APP LOGICS --- */
+
+    // 1. NOTES & DREAMS (Persistence)
+    $('#notes-area').value = localStorage.getItem('theoos-notes') || ''; // Usando chave antiga para compatibilidade
+    $('#notes-area').oninput = (e) => localStorage.setItem('theoos-notes', e.target.value);
+    $('#dreams-area').value = localStorage.getItem('theo_dreams') || '';
+    $('#dreams-area').oninput = (e) => localStorage.setItem('theo_dreams', e.target.value);
+
+    // 2. GALLERY
+    const GalleryApp = {
+        render() {
+            const grid = $('#gallery-grid');
+            grid.innerHTML = '';
+            Kernel.data.photos.forEach(src => {
+                const div = document.createElement('div');
+                div.className = 'gallery-item';
+                div.innerHTML = `<img src="${src}">`;
+                grid.appendChild(div);
+            });
+        },
+        add(file) {
             const reader = new FileReader();
-            reader.onload = (event) => { photos.push({ src: event.target.result, caption: caption }); savePhotos(); renderGallery(); };
+            reader.onload = e => {
+                Kernel.data.photos.push(e.target.result);
+                Kernel.save();
+                this.render();
+            };
             reader.readAsDataURL(file);
         }
-    });
-
-    // Player de Música
-    const musicUploadInput = $('#musicUploadInput');
-    const songTitle = $('#song-title'), playPauseBtn = $('#play-pause-btn');
-    const prevBtn = $('#prev-btn'), nextBtn = $('#next-btn');
-    const playIcon = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`, pauseIcon = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-    let appPlaylist = []; let currentAppTrackIndex = 0;
-    function loadAppTrack(index) {
-        if (index < 0 || index >= appPlaylist.length) return;
-        currentAppTrackIndex = index;
-        appMusicPlayer.src = appPlaylist[index].url;
-        songTitle.textContent = appPlaylist[index].name;
-        appMusicPlayer.play();
-    }
-    function updatePlayPauseIcon() { playPauseBtn.innerHTML = appMusicPlayer.paused ? playIcon : pauseIcon; }
-    playPauseBtn.addEventListener('click', () => { if (appPlaylist.length > 0) { appMusicPlayer.paused ? appMusicPlayer.play() : appMusicPlayer.pause(); }});
-    nextBtn.addEventListener('click', () => { if (appPlaylist.length > 0) loadAppTrack((currentAppTrackIndex + 1) % appPlaylist.length); });
-    prevBtn.addEventListener('click', () => { if (appPlaylist.length > 0) loadAppTrack((currentAppTrackIndex - 1 + appPlaylist.length) % appPlaylist.length); });
-    appMusicPlayer.addEventListener('play', () => { backgroundMusicPlayer.pause(); updatePlayPauseIcon(); });
-    appMusicPlayer.addEventListener('pause', () => { if(backgroundMusicPlayer.src && !backgroundMusicPlayer.muted) backgroundMusicPlayer.play(); updatePlayPauseIcon(); });
-    appMusicPlayer.addEventListener('ended', () => { if (currentAppTrackIndex === appPlaylist.length - 1) { if(backgroundMusicPlayer.src && !backgroundMusicPlayer.muted) backgroundMusicPlayer.play(); songTitle.textContent = '-- Nenhuma --'; updatePlayPauseIcon(); } else { nextBtn.click(); }});
-    musicUploadInput?.addEventListener('change', (e) => {
-        const wasEmpty = appPlaylist.length === 0;
-        for (const file of e.target.files) { appPlaylist.push({ name: file.name, url: URL.createObjectURL(file) }); }
-        if (wasEmpty && appPlaylist.length > 0) { loadAppTrack(0); }
-    });
-    updatePlayPauseIcon();
-    
-    // Terminal
-    const term = $('#term'), termInput = $('#termInput');
-    const commands={ajuda:()=>print("Comandos: ajuda, oi, data, amor, limpar"),oi:()=>print("Oi, Theo! 💖"),data:()=>print(new Date().toLocaleString('pt-BR')),amor:()=>print("Amor = 100%."),limpar:()=>term.querySelectorAll('div:not(:first-child)').forEach(d=>d.remove())};
-    function print(t){const l=document.createElement('div');l.innerHTML=t;term.insertBefore(l,termInput);term.scrollTop=term.scrollHeight}
-    termInput?.addEventListener('keydown',e=>{if(e.key==='Enter'){const v=termInput.value.trim().toLowerCase();print(`<span class="prompt">theo@amor:~$</span> ${v}`);termInput.value='';commands[v]?commands[v]():print('Comando não encontrado.')}});
-
-    // Jogo dos Corações
-    const gameArea=$('#gameArea'); let score=0;
-    function spawnHeart(){const h=document.createElement('div');h.textContent='💗';h.style.cssText=`position:absolute;left:${Math.random()*(gameArea.clientWidth-24)}px;top:${Math.random()*(gameArea.clientHeight-24)}px;font-size:${Math.random()*24+18}px;user-select:none;cursor:pointer;`;h.addEventListener('click',()=>{score++;$('#score').textContent=score;h.remove();});gameArea.appendChild(h);setTimeout(()=>h.remove(),1800)}
-    setInterval(()=>{if(gameArea && $('#win-game').style.display==='flex')spawnHeart()},600);
-
-    // Lembrete do Dia
-    const reminders = ["Lembrete: Você é meu lugar favorito. 💖", "Não se esqueça do quão incrível você é!", "Um abraço seu cura tudo. ✨", "Você tem o sorriso mais lindo.", "Sou sua fã número 1!"];
-    function showRandomReminder() { $('#reminder-text').textContent = reminders[Math.floor(Math.random() * reminders.length)]; }
-
-    // App de Desenho
-    const paintCanvas = $('#paint-canvas'), colorPalette = $('#color-palette');
-    let ctx, isDrawing = false, lastX = 0, lastY = 0;
-    const colors = ['#3a3a3a', '#ff8aa0', '#ffd47a', '#9be69b', '#84c8ff', '#9c79ff'];
-    function initPaint() {
-      if (ctx) return;
-      ctx = paintCanvas.getContext('2d');
-      const rect = paintCanvas.getBoundingClientRect();
-      paintCanvas.width = rect.width; paintCanvas.height = rect.height;
-      ctx.lineCap = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = colors[0];
-      colors.forEach((c, i) => { const b = document.createElement('div'); b.className = 'color-box'; b.style.background = c; if (i === 0) b.classList.add('active'); b.addEventListener('click', () => { ctx.strokeStyle = c; $$('.color-box').forEach(x => x.classList.remove('active')); b.classList.add('active'); }); colorPalette.appendChild(b); });
-      paintCanvas.addEventListener('mousedown', (e) => { isDrawing = true; [lastX, lastY] = [e.offsetX, e.offsetY]; });
-      paintCanvas.addEventListener('mousemove', (e) => { if (!isDrawing) return; ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); [lastX, lastY] = [e.offsetX, e.offsetY]; });
-      paintCanvas.addEventListener('mouseup', () => isDrawing = false);
-      paintCanvas.addEventListener('mouseleave', () => isDrawing = false);
-      $('#clear-canvas-btn')?.addEventListener('click', () => ctx.clearRect(0, 0, paintCanvas.width, paintCanvas.height));
-    }
-
-    // Calculadora
-    const calcDisplay = $('#calc-display');
-    const calcContainer = $('.calculator');
-    'C,/,*,CE,7,8,9,-,4,5,6,+,1,2,3,=,0,.'.split(',').forEach(label => {
-        const btn = document.createElement('button'); btn.textContent = label; btn.className = 'calc-btn';
-        if ('/*-+'.includes(label)) btn.classList.add('op'); if (label === '=') btn.classList.add('eq');
-        btn.addEventListener('click', () => {
-            playSound('click');
-            let current = calcDisplay.textContent === '0' || calcDisplay.textContent === 'Erro' ? '' : calcDisplay.textContent;
-            if (label === 'C') { current = '0'; }
-            else if (label === 'CE') { current = current.slice(0, -1) || '0'; }
-            else if (label === '=') { try { current = String(eval(current.replace(/[^0-9.*/+-.]/g, ''))); } catch { current = 'Erro'; } }
-            else { current += label; }
-            calcDisplay.textContent = current;
-        });
-        calcContainer?.appendChild(btn);
-    });
-
-    // Configurações (Temas e Wallpapers)
-    const root = document.documentElement, wallpaper = $('#wallpaper');
-    const themes = {
-        'Pastel Padrão': { '--xp-blue': '#b3d4ff', '--xp-pink': '#ffd3e2', '--titlebar-focus': 'linear-gradient(180deg, #ffd6e8, #ffc2dc)' },
-        'Rosa Doce': { '--xp-blue': '#ffcde6', '--xp-pink': '#ffb3d9', '--titlebar-focus': 'linear-gradient(180deg, #e6d9ff, #d9c2ff)' }
     };
-    const wallpapers = {
-        'Verde e Azul': `radial-gradient(1200px 700px at 60% 110%, #b8f7c3 0%, #a8e9f0 55%, #c9d8ff 100%)`,
-        'Amor Rosa': `url('wallpaper2.jpg')`
-    };
-    function applyTheme(name) { Object.entries(themes[name]).forEach(([k, v]) => root.style.setProperty(k, v)); localStorage.setItem('theoos-theme', name); updateActiveButtons('#theme-options', name); }
-    function applyWallpaper(name) { wallpaper.style.backgroundImage = wallpapers[name]; localStorage.setItem('theoos-wallpaper', name); updateActiveButtons('#wallpaper-options', name); }
-    function updateActiveButtons(id, active) { $$(`${id} button`).forEach(b => b.classList.toggle('active', b.textContent === active)); }
-    function loadSettings() {
-        applyTheme(localStorage.getItem('theoos-theme') || 'Pastel Padrão');
-        applyWallpaper(localStorage.getItem('theoos-wallpaper') || 'Verde e Azul');
-    }
-    Object.keys(themes).forEach(name => { const btn = document.createElement('button'); btn.textContent = name; btn.onclick = () => applyTheme(name); $('#theme-options')?.appendChild(btn); });
-    Object.keys(wallpapers).forEach(name => { const btn = document.createElement('button'); btn.textContent = name; btn.onclick = () => applyWallpaper(name); $('#wallpaper-options')?.appendChild(btn); });
+    $('#img-upload').onchange = (e) => { if(e.target.files[0]) GalleryApp.add(e.target.files[0]); };
 
-    // Aventura (RPG de Texto)
-    const story = {
-        start: { text: "Você e Theo encontram uma clareira mágica. No centro, uma fonte sussurra melodias. À direita, uma trilha brilha com poeira de estrelas. O que fazer?", choices: [{ text: "Beber da fonte", next: "fonte" }, { text: "Seguir a trilha", next: "trilha" }] },
-        fonte: { text: "Ao beberem a água, vocês começam a flutuar! No céu, uma nuvem em formato de coração acena.", choices: [{ text: "Flutuar até a nuvem", next: "nuvem" }, { text: "Tentar voltar ao chão", next: "chao" }] },
-        trilha: { text: "A trilha leva a uma árvore gigante com uma porta com maçaneta de biscoito.", choices: [{ text: "Girar a maçaneta", next: "porta" }, { text: "Comer a maçaneta!", next: "comer_macaneta" }] },
-        nuvem: { text: "A nuvem é de algodão-doce! É o piquenique mais fofo de todos. (Final Feliz ☁️)", choices: [{ text: "Recomeçar", next: "start" }] },
-        chao: { text: "Vocês voltam ao chão e agora podem falar com animais. Um coelho os convida para um chá.", choices: [{ text: "Aceitar", next: "cha_coelho" }, { text: "Recusar", next: "start" }] },
-        cha_coelho: { text: "A festa do chá é maravilhosa, com bolos de cenoura e risadas. (Final Amigável 🐰)", choices: [{ text: "Recomeçar", next: "start" }] },
-        porta: { text: "A porta se abre para uma biblioteca aconchegante dentro da árvore. (Final Aconchegante 📚)", choices: [{ text: "Recomeçar", next: "start" }] },
-        comer_macaneta: { text: "A maçaneta é deliciosa, mas a porta some! Oops. (Fim Engraçado 🍪)", choices: [{ text: "Recomeçar", next: "start" }] }
+    // 3. PAINT
+    const PaintApp = {
+        ctx: null, color: '#00b894',
+        init() {
+            const cvs = $('#paint-canvas');
+            this.ctx = cvs.getContext('2d');
+            this.ctx.lineCap = 'round';
+            this.ctx.lineWidth = 4;
+            let drawing = false;
+            
+            const colors = ['#2d3436', '#00b894', '#0984e3', '#e84393', '#fdcb6e', '#636e72'];
+            const pal = $('#paint-colors');
+            if(pal.innerHTML === '') {
+                colors.forEach(c => {
+                    const sw = document.createElement('div');
+                    sw.className = 'color-swatch';
+                    sw.style.backgroundColor = c;
+                    sw.onclick = () => { 
+                        this.color = c; 
+                        $$('.color-swatch').forEach(s => s.classList.remove('active'));
+                        sw.classList.add('active');
+                    };
+                    pal.appendChild(sw);
+                });
+            }
+
+            cvs.onmousedown = (e) => { drawing = true; this.ctx.beginPath(); this.ctx.moveTo(e.offsetX, e.offsetY); };
+            cvs.onmousemove = (e) => {
+                if(!drawing) return;
+                this.ctx.strokeStyle = this.color;
+                this.ctx.lineTo(e.offsetX, e.offsetY);
+                this.ctx.stroke();
+            };
+            cvs.onmouseup = () => drawing = false;
+        }
     };
-    const adventureText = $('#adventure-text'), adventureChoices = $('#adventure-choices');
-    function renderScene(sceneKey) {
-        const scene = story[sceneKey]; if (!scene) return;
-        adventureText.textContent = scene.text;
-        adventureChoices.innerHTML = '';
-        scene.choices.forEach(choice => {
-            const button = document.createElement('button');
-            button.className = 'btn btn-primary';
-            button.textContent = choice.text;
-            button.onclick = () => { playSound('click'); renderScene(choice.next); };
-            adventureChoices.appendChild(button);
-        });
-    }
+    window.clearPaint = () => { const c=$('#paint-canvas'); c.getContext('2d').clearRect(0,0,c.width,c.height); };
+
+    // 4. CALCULATOR
+    const CalcApp = {
+        init() {
+            const keys = ['C','/','*','Back','7','8','9','-','4','5','6','+','1','2','3','=','0','.'];
+            const board = $('#calc-keys');
+            if(board.children.length > 1) return;
+            keys.forEach(k => {
+                const btn = document.createElement('button');
+                btn.className = `calc-btn ${['/','*','-','+'].includes(k) ? 'op' : ''} ${k==='='?'eq':''}`;
+                btn.innerText = k;
+                if(k==='=') btn.style.gridColumn = 'span 2';
+                if(k==='0') btn.style.gridColumn = 'span 2';
+                btn.onclick = () => { playSound('#sfx-click'); this.press(k); };
+                board.appendChild(btn);
+            });
+        },
+        press(k) {
+            const d = $('#calc-disp');
+            if(k === 'C') d.innerText = '0';
+            else if(k === 'Back') d.innerText = d.innerText.slice(0,-1) || '0';
+            else if(k === '=') { try { d.innerText = eval(d.innerText); } catch { d.innerText = 'Err'; } }
+            else d.innerText = d.innerText === '0' ? k : d.innerText + k;
+        }
+    };
+
+    // 5. GAME (Fixed)
+    const GameApp = {
+        score: 0, timer: null,
+        start() {
+            this.score = 0; $('#game-score').innerText = 0;
+            if(this.timer) clearInterval(this.timer);
+            this.timer = setInterval(() => this.spawn(), 800);
+        },
+        stop() { clearInterval(this.timer); $('#game-area').innerHTML=''; },
+        spawn() {
+            const h = document.createElement('div');
+            h.innerText = '❤️';
+            h.className = 'game-heart';
+            h.style.left = (Math.random() * 90) + '%';
+            h.onmousedown = (e) => { 
+                e.stopPropagation(); 
+                this.score++; 
+                $('#game-score').innerText = this.score; 
+                h.remove(); 
+            };
+            $('#game-area').appendChild(h);
+            setTimeout(() => { if(h.parentElement) h.remove(); }, 3000);
+        },
+        clickBg() { /* miss click? */ }
+    };
+
+    // 6. ADVENTURE (RESTORED ORIGINAL)
+    const AdvApp = {
+        story: {
+            start: { text: "Você e Theo encontram uma clareira mágica. No centro, uma fonte sussurra melodias. À direita, uma trilha brilha com poeira de estrelas. O que fazer?", choices: [{ text: "Beber da fonte", next: "fonte" }, { text: "Seguir a trilha", next: "trilha" }] },
+            fonte: { text: "Ao beberem a água, vocês começam a flutuar! No céu, uma nuvem em formato de coração acena.", choices: [{ text: "Flutuar até a nuvem", next: "nuvem" }, { text: "Tentar voltar ao chão", next: "chao" }] },
+            trilha: { text: "A trilha leva a uma árvore gigante com uma porta com maçaneta de biscoito.", choices: [{ text: "Girar a maçaneta", next: "porta" }, { text: "Comer a maçaneta!", next: "comer_macaneta" }] },
+            nuvem: { text: "A nuvem é de algodão-doce! É o piquenique mais fofo de todos. (Final Feliz ☁️)", choices: [{ text: "Recomeçar", next: "start" }] },
+            chao: { text: "Vocês voltam ao chão e agora podem falar com animais. Um coelho os convida para um chá.", choices: [{ text: "Aceitar", next: "cha_coelho" }, { text: "Recusar", next: "start" }] },
+            cha_coelho: { text: "A festa do chá é maravilhosa, com bolos de cenoura e risadas. (Final Amigável 🐰)", choices: [{ text: "Recomeçar", next: "start" }] },
+            porta: { text: "A porta se abre para uma biblioteca aconchegante dentro da árvore. (Final Aconchegante 📚)", choices: [{ text: "Recomeçar", next: "start" }] },
+            comer_macaneta: { text: "A maçaneta é deliciosa, mas a porta some! Oops. (Fim Engraçado 🍪)", choices: [{ text: "Recomeçar", next: "start" }] }
+        },
+        render(sceneKey) {
+            const scene = this.story[sceneKey]; if(!scene) return;
+            $('#adv-text').innerText = scene.text;
+            $('#adv-opts').innerHTML = '';
+            scene.choices.forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.innerText = o.text;
+                btn.onclick = () => { playSound('#sfx-click'); this.render(o.next); };
+                $('#adv-opts').appendChild(btn);
+            });
+        }
+    };
+
+    // 7. MUSIC (RESTORED PLAYLIST)
+    const MusicApp = {
+        audio: $('#bgMusicPlayer'),
+        playlist: [
+            { name: "Música Fofa 1", src: "musga_1.mp3" },
+            { name: "Música Fofa 2", src: "musga_2.mp3" }
+        ],
+        idx: 0,
+        isPlaying: false,
+
+        init() {
+            // Tenta carregar a primeira musica se existir
+            this.loadTrack(0);
+            this.audio.onended = () => this.next();
+        },
+        
+        loadTrack(i) {
+            this.idx = i;
+            this.audio.src = this.playlist[i].src;
+            $('#music-status').innerText = this.playlist[i].name;
+        },
+
+        startBackground() {
+            this.loadTrack(0);
+            this.audio.volume = 0.3; // Volume baixo para background
+            this.audio.play().catch(e => console.log("Erro ao iniciar música de fundo"));
+            this.isPlaying = true;
+        },
+
+        playPause() {
+            if(this.audio.paused) { 
+                this.audio.play().catch(e => console.log("Audio file missing?")); 
+                this.isPlaying = true;
+            } else { 
+                this.audio.pause(); 
+                this.isPlaying = false;
+            }
+        },
+        
+        next() {
+            let nextIdx = (this.idx + 1) % this.playlist.length;
+            this.loadTrack(nextIdx);
+            if(this.isPlaying) this.audio.play();
+        },
+        
+        prev() {
+            let prevIdx = (this.idx - 1 + this.playlist.length) % this.playlist.length;
+            this.loadTrack(prevIdx);
+            if(this.isPlaying) this.audio.play();
+        },
+
+        add(file) {
+            const url = URL.createObjectURL(file);
+            this.playlist.push({ name: file.name, src: url });
+            // Se for a unica, carrega
+            if(this.playlist.length === 3) { // 2 defaults + 1 new
+                this.loadTrack(2);
+                this.audio.play();
+            }
+        }
+    };
+    $('#music-upload').onchange = (e) => { 
+        for(let f of e.target.files) MusicApp.add(f); 
+    };
+    MusicApp.init(); // Setup defaults
+
+    // 8. ORACLE
+    const OracleApp = {
+        answers: ["Sim, com certeza!", "Talvez num sonho.", "Os astros dizem que sim.", "Pergunte mais tarde.", "Ame a si mesmo primeiro."],
+        ask() {
+            $('#oracle-res').innerText = this.answers[Math.floor(Math.random()*this.answers.length)];
+        }
+    };
+
+    // 9. REMINDER (RESTORED ORIGINAL)
+    const ReminderApp = {
+        msgs: ["Lembrete: Você é meu lugar favorito. 💖", "Não se esqueça do quão incrível você é!", "Um abraço seu cura tudo. ✨", "Você tem o sorriso mais lindo.", "Sou sua fã número 1!"],
+        new() { $('#reminder-txt').innerText = this.msgs[Math.floor(Math.random()*this.msgs.length)]; }
+    };
+
+    // 10. TERMINAL (RESTORED ORIGINAL)
+    $('#term-in').onkeydown = (e) => {
+        if(e.key === 'Enter') {
+            const val = e.target.value.toLowerCase().trim();
+            const out = $('#term-out');
+            
+            const print = (txt) => {
+                 out.innerHTML += `<div>${txt}</div>`;
+                 out.scrollTop = out.scrollHeight;
+            }
+            
+            print(`<span class="prompt">theo@amor:~$</span> ${val}`);
+            
+            if(val === 'ajuda') print("Comandos: ajuda, oi, data, amor, limpar");
+            else if(val === 'limpar') out.innerHTML = '';
+            else if(val === 'data') print(new Date().toLocaleString('pt-BR'));
+            else if(val === 'amor') print("Amor = 100%.");
+            else if(val === 'oi') print("Oi, Theo! 💖");
+            else print('Comando não encontrado.');
+            
+            e.target.value = '';
+        }
+    };
+
+    /* --- BOOTSTRAP --- */
+    window.closeWin = UI.closeWin.bind(UI); 
+    window.Boot = Boot; 
+
+    // Login Logic
+    $('#heart-btn').onclick = () => { $('#pass-input').focus(); };
+    $('#login-form').onsubmit = (e) => {
+        e.preventDefault();
+        const p = $('#pass-input').value.toLowerCase();
+        if(p === 'theo' || p === '') {
+            $('#login-ritual').style.opacity = 0;
+            setTimeout(() => { $('#login-ritual').style.display='none'; $('#desktop').style.display='block'; }, 800);
+            playSound('#sfx-click');
+            MusicApp.startBackground(); // Assegura que a música toque após o login
+        } else {
+            $('#login-msg').innerText = 'Senha errada... Tente "theo"';
+            $('#login-msg').style.color = '#ff7675';
+        }
+    };
+
+    // Init
+    Kernel.init();
+    UI.init();
 
   </script>
 </body>
