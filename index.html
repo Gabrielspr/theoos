@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>TheoOS 4</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>TheoOS Mobile and PC</title>
   <style>
     /* --- DESIGN SYSTEM PRO: SOFT TECH EDITION --- */
     :root {
@@ -78,7 +78,17 @@
     .login-input { background: transparent; border: 0; border-bottom: 2px solid rgba(255,255,255,0.5); color: white; font-size: 1.5rem; text-align: center; padding: 10px; outline: none; margin-top: 20px; width: 200px; }
 
     /* Desktop */
-    #desktop { position: absolute; inset: 0; display: none; }
+    #desktop { position: absolute; inset: 0; display: none; overflow: hidden; }
+    .device-topbar { position: absolute; top: 14px; right: 16px; z-index: 900; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.56); border-radius: 16px; background: rgba(237, 255, 252, 0.58); backdrop-filter: blur(18px); box-shadow: 0 12px 30px rgba(37,60,80,0.12); color: #1e3032; }
+    .device-brand { display: flex; align-items: baseline; gap: 8px; line-height: 1; }
+    .device-brand strong { font-size: 15px; }
+    .device-brand span { font-size: 11px; font-weight: 700; letter-spacing: 0; text-transform: uppercase; opacity: 0.72; }
+    .mobile-label { display: none; }
+    .device-signal { display: flex; align-items: center; gap: 4px; }
+    .signal-dot { width: 6px; height: 12px; border-radius: 4px; background: rgba(0,168,168,0.32); }
+    .signal-dot:nth-child(2) { height: 16px; background: rgba(0,168,168,0.52); }
+    .signal-dot:nth-child(3) { height: 20px; background: var(--accent); }
+    body.night-mode .device-topbar { background: rgba(8, 22, 26, 0.72); border-color: rgba(85, 239, 196, 0.35); color: white; }
     
     /* Icons */
     .icons-area { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 20px; max-width: 600px; }
@@ -222,11 +232,27 @@
     .todo-item.done span { text-decoration: line-through; opacity:0.58; }
 
     @media (max-width: 700px) {
-      .icons-area { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 12px; max-width: 100%; padding: 12px 12px 70px; }
-      .app-icon-bg { width: 52px; height: 52px; border-radius: 14px; }
-      .app-icon span { font-size: 12px; }
-      .window { min-width: 0; max-width: calc(100vw - 16px); max-height: calc(100vh - 72px); left: 8px !important; top: 8px !important; }
-      .window[style] { width: calc(100vw - 16px) !important; height: min(560px, calc(100vh - 72px)) !important; }
+      body, html { min-height: 100%; height: 100dvh; }
+      #wallpaper::after { background-size: 34px 34px; opacity: 0.82; }
+      .cloud { display: none; }
+      #power-btn { width: min(280px, calc(100vw - 40px)); justify-content: center; padding: 14px 20px; font-size: 1rem; }
+      #login-ritual { padding: 24px; }
+      .login-input { width: min(260px, 80vw); font-size: 1.15rem; }
+      .device-topbar { top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; height: 54px; justify-content: space-between; border-radius: 18px; padding: 10px 14px; }
+      .pc-label { display: none; }
+      .mobile-label { display: inline; }
+      .device-brand { flex-direction: column; gap: 4px; align-items: flex-start; }
+      .device-brand strong { font-size: 17px; }
+      .icons-area { grid-template-columns: repeat(4, minmax(0, 1fr)); align-content: start; gap: 16px 10px; max-width: none; height: 100dvh; overflow-y: auto; padding: calc(env(safe-area-inset-top) + 82px) 14px calc(env(safe-area-inset-bottom) + 92px); }
+      .app-icon { gap: 7px; min-width: 0; }
+      .app-icon:hover { transform: none; }
+      .app-icon-bg { width: 58px; height: 58px; border-radius: 16px; font-size: 28px; }
+      .app-icon span { width: 100%; max-width: 78px; font-size: 11px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .window { min-width: 0; max-width: calc(100vw - 16px); max-height: none; left: 8px !important; top: calc(env(safe-area-inset-top) + 72px) !important; border-radius: 18px; }
+      .window[style] { width: calc(100vw - 16px) !important; height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 150px) !important; }
+      .titlebar { height: 44px; cursor: default; }
+      .win-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .win-controls button { width: 16px; height: 16px; }
       .win-body { padding: 10px; }
       .web-toolbar { gap: 6px; }
       .web-toolbar .btn { min-width: 34px; padding: 8px; }
@@ -234,9 +260,13 @@
       .web-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .web-tile { padding: 8px; }
       .web-viewport { min-height: 220px; }
-      .start-menu { width: min(280px, calc(100vw - 20px)); }
-      .taskbar { height: 56px; }
-      .clock { font-size: 12px; }
+      .start-menu { left: 8px; right: 8px; bottom: calc(env(safe-area-inset-bottom) + 82px); width: auto; max-height: min(520px, 58dvh); overflow: auto; border-radius: 18px; }
+      .taskbar { left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); width: auto; height: 66px; border-radius: 22px; padding: 0 8px; border: 1px solid rgba(255,255,255,0.66); box-shadow: 0 14px 34px rgba(37,60,80,0.2); }
+      .start-btn { width: 52px; height: 52px; padding: 0; justify-content: center; border-radius: 16px; font-size: 0; margin-right: 8px; flex: 0 0 auto; }
+      .start-btn::before { content: "Theo"; font-size: 13px; }
+      .task-list { gap: 8px; }
+      .task-item { height: 40px; display: flex; align-items: center; max-width: 130px; }
+      .clock { display: none; }
       .code-app { grid-template-columns: 1fr; }
       .mini-stat { grid-template-columns: 1fr; }
     }
@@ -262,7 +292,7 @@
     <video id="boot-video" src="boot.mp4" playsinline></video>
     <button id="power-btn" onclick="Boot.start()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-      Ligar TheoOS
+      Ligar TheoOS Mobile + PC
     </button>
   </div>
 
@@ -287,6 +317,18 @@
 
   <!-- DESKTOP -->
   <div id="desktop">
+    <div class="device-topbar" aria-label="TheoOS device mode">
+        <div class="device-brand">
+            <strong>TheoOS</strong>
+            <span class="pc-label">PC Version</span>
+            <span class="mobile-label">Mobile Version</span>
+        </div>
+        <div class="device-signal" aria-hidden="true">
+            <span class="signal-dot"></span>
+            <span class="signal-dot"></span>
+            <span class="signal-dot"></span>
+        </div>
+    </div>
     <div class="icons-area" id="desktop-icons"></div>
 
     <!-- JANELAS (APPS) -->
@@ -296,7 +338,7 @@
         <div class="window" id="win-changelog" style="width: 450px; height: 500px; left: 50px; top: 50px;">
             <div class="titlebar"><div class="win-title">📜 Changelog 4.1</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-changelog')"></button></div></div>
             <div class="win-body">
-                <h3>TheoOS 4.1 — Soft Tech Edition</h3>
+                <h3>TheoOS 4.2 — Mobile and PC Version</h3>
                 <ul style="padding-left: 20px; line-height: 1.6;">
                     <li><b>🌐 TheoWeb corrigido:</b> Sites que bloqueiam janela interna agora abrem em aba normal, sem tela quebrada.</li>
                     <li><b>🚀 App Center:</b> Hub de sites legais com ChatGPT, GitHub, Canva, Discord, WhatsApp e mais.</li>
@@ -640,7 +682,7 @@
                     <button class="btn" style="background:#b62b2b" onclick="UI.setWallpaper('adult_red')">Adult Red</button>
                 </div>
                 
-                <p style="margin-top:20px; font-size:12px; color:gray;">TheoOS v4.1 Soft Tech<br>Heart Kernel + Web Suite Active</p>
+                <p style="margin-top:20px; font-size:12px; color:gray;">TheoOS Mobile and PC Version<br>Heart Kernel + Web Suite Active</p>
             </div>
         </div>
         
@@ -675,7 +717,7 @@
     </div>
     
     <div class="start-menu" id="start-menu">
-        <div style="padding:10px; font-weight:bold; border-bottom:1px solid #eee; color: var(--accent);">Olá, Theo 🌿</div>
+        <div style="padding:10px; font-weight:bold; border-bottom:1px solid #eee; color: var(--accent);">TheoOS Mobile + PC</div>
         <div id="start-items"></div>
     </div>
 
