@@ -3,25 +3,27 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>TheoOS Pro 3.1 (Green Edition)</title>
+  <title>TheoOS 4</title>
   <style>
-    /* --- DESIGN SYSTEM PRO: GREEN EDITION --- */
+    /* --- DESIGN SYSTEM PRO: SOFT TECH EDITION --- */
     :root {
-      /* Day Theme (Natureza) */
-      --bg-grad: radial-gradient(1200px 700px at 60% 110%, #b8f7c3 0%, #a8e9f0 55%, #c9d8ff 100%); /* Original restaurado como base */
-      --win-bg: rgba(255, 255, 255, 0.85);
-      --text: #2d3436;
-      --accent: #00b894; /* Verde Menta */
+      /* Day Theme (Soft Tech) */
+      --bg-grad: linear-gradient(135deg, #eaf6ff 0%, #bfefff 36%, #d6f7e8 70%, #f8e8ff 100%);
+      --win-bg: rgba(248, 252, 255, 0.88);
+      --text: #24313a;
+      --accent: #00a8a8;
+      --accent-2: #4c6fff;
+      --accent-warm: #ff7ab6;
       --glass-border: rgba(255, 255, 255, 0.6);
       
-      /* Night Theme (Floresta Noturna) */
-      --bg-night-grad: linear-gradient(to bottom, #093028, #237a57);
-      --win-bg-night: rgba(10, 30, 20, 0.9);
-      --text-night: #ecf0f1;
+      /* Night Theme (Soft Terminal) */
+      --bg-night-grad: linear-gradient(135deg, #071d20 0%, #12383b 55%, #30233d 100%);
+      --win-bg-night: rgba(8, 22, 26, 0.9);
+      --text-night: #edf7f7;
       
       /* Specs */
       --radius: 14px;
-      --shadow: 0 15px 35px rgba(0,0,0,0.2);
+      --shadow: 0 20px 48px rgba(37, 60, 80, 0.18);
       --font-ui: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
     }
 
@@ -32,12 +34,12 @@
     body.night-mode #wallpaper { background: var(--bg-night-grad); } 
     /* Nota: O JS vai sobrescrever o background do wallpaper se o usuário escolher um específico */
     
-    body.night-mode .window { background: var(--win-bg-night); border-color: #2ecc71; color: var(--text-night); }
+    body.night-mode .window { background: var(--win-bg-night); border-color: rgba(85, 239, 196, 0.35); color: var(--text-night); }
     body.night-mode .titlebar { background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); }
-    body.night-mode .taskbar { background: rgba(5, 20, 10, 0.85); border-top: 1px solid #2ecc71; }
-    body.night-mode .start-menu { background: rgba(10, 30, 20, 0.95); color: white; border: 1px solid #2ecc71; }
-    body.night-mode input, body.night-mode textarea { color: white; background: rgba(0,0,0,0.3); border-color: #2ecc71; }
-    body.night-mode .btn { background: #27ae60; }
+    body.night-mode .taskbar { background: rgba(8, 22, 26, 0.82); border-top: 1px solid rgba(85, 239, 196, 0.35); }
+    body.night-mode .start-menu { background: rgba(8, 22, 26, 0.95); color: white; border: 1px solid rgba(85, 239, 196, 0.35); }
+    body.night-mode input, body.night-mode textarea { color: white; background: rgba(0,0,0,0.28); border-color: rgba(85, 239, 196, 0.35); }
+    body.night-mode .btn { background: #00a8a8; }
 
     /* --- LAYOUT --- */
     #wallpaper { 
@@ -46,6 +48,15 @@
         transition: background-image 0.5s ease-in-out; 
         background-size: cover;
         background-position: center;
+    }
+    #wallpaper::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(255,255,255,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px);
+        background-size: 42px 42px;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,0.42), transparent 72%);
+        pointer-events: none;
     }
 
     /* Clouds (Do original) */
@@ -73,21 +84,21 @@
     .icons-area { padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 20px; max-width: 600px; }
     .app-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); gap: 5px; transition: transform 0.2s; }
     .app-icon:hover { transform: translateY(-5px); }
-    .app-icon-bg { width: 58px; height: 58px; background: rgba(255,255,255,0.2); border-radius: 16px; display: grid; place-items: center; font-size: 28px; backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .app-icon-bg { width: 58px; height: 58px; background: rgba(255,255,255,0.46); border-radius: 16px; display: grid; place-items: center; font-size: 28px; backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.62); box-shadow: 0 10px 24px rgba(37,60,80,0.12); }
 
     /* Windows */
     .window { position: absolute; background: var(--win-bg); border-radius: var(--radius); box-shadow: var(--shadow); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); display: flex; flex-direction: column; min-width: 300px; min-height: 200px; overflow: hidden; opacity: 0; transform: scale(0.9); pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
     .window.open { opacity: 1; transform: scale(1); pointer-events: auto; }
     .window.minimized { opacity: 0; transform: translateY(50px) scale(0.8); pointer-events: none; }
-    .titlebar { height: 40px; display: flex; align-items: center; padding: 0 12px; background: rgba(0,0,0,0.03); border-bottom: 1px solid rgba(0,0,0,0.05); cursor: move; justify-content: space-between; }
+    .titlebar { height: 40px; display: flex; align-items: center; padding: 0 12px; background: rgba(255,255,255,0.3); border-bottom: 1px solid rgba(0,0,0,0.05); cursor: move; justify-content: space-between; }
     .win-title { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
     .win-controls button { width: 12px; height: 12px; border-radius: 50%; border: none; margin-left: 6px; cursor: pointer; }
     .btn-close { background: #ff5f56; } .btn-min { background: #ffbd2e; } .btn-max { background: #27c93f; }
     .win-body { flex: 1; overflow: auto; padding: 15px; position: relative; }
 
     /* Taskbar */
-    .taskbar { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(255,255,255,0.5); backdrop-filter: blur(20px); display: flex; align-items: center; padding: 0 10px; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.4); }
-    .start-btn { background: rgba(255,255,255,0.8); border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #00b894; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; gap:6px; margin-right: 10px;}
+    .taskbar { position: absolute; bottom: 0; width: 100%; height: 50px; background: rgba(237, 255, 252, 0.62); backdrop-filter: blur(24px); display: flex; align-items: center; padding: 0 10px; z-index: 1000; border-top: 1px solid rgba(255,255,255,0.66); }
+    .start-btn { background: rgba(255,255,255,0.82); border: none; padding: 8px 16px; border-radius: 10px; font-weight: bold; cursor: pointer; color: var(--accent); box-shadow: 0 6px 18px rgba(37,60,80,0.12); display:flex; align-items:center; gap:6px; margin-right: 10px;}
     .start-btn:hover { background: white; }
     .task-list { display: flex; gap: 6px; overflow-x: auto; flex: 1; }
     .task-item { padding: 8px 14px; background: rgba(255,255,255,0.4); border-radius: 10px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: 0.2s; border: 1px solid transparent; }
@@ -153,6 +164,88 @@
     .zen-circle { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(from 0deg, #55efc4, #00b894, #55efc4); margin: 40px auto; animation: spinBreath 6s linear infinite; display: grid; place-items: center; color: white; font-size: 12px; box-shadow: 0 0 30px rgba(85, 239, 196, 0.4); }
     @keyframes spinBreath { 0% { transform: rotate(0deg) scale(0.8); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(0.8); } }
 
+    /* Web Suite */
+    .web-app { height: 100%; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+    .web-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .web-toolbar .btn { padding: 8px 10px; min-width: 38px; }
+    .web-input { flex: 1; min-width: 190px; height: 38px; }
+    .web-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 8px; }
+    .web-tile { border: 1px solid rgba(0,0,0,0.08); background: rgba(255,255,255,0.62); border-radius: 8px; padding: 10px; cursor: pointer; text-align: left; color: inherit; font: inherit; display: flex; align-items: center; gap: 8px; transition: 0.18s; }
+    .web-tile:hover { transform: translateY(-2px); background: white; border-color: var(--accent); }
+    .web-tile strong { display: block; font-size: 13px; }
+    .web-viewport { position: relative; flex: 1; min-height: 260px; border-radius: 8px; overflow: hidden; background: #101820; border: 1px solid rgba(0,0,0,0.12); }
+    .web-viewport iframe { width: 100%; height: 100%; border: 0; background: white; display: block; }
+    .web-placeholder { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: rgba(255,255,255,0.88); background: linear-gradient(135deg, #101820, #175c55); }
+    .web-placeholder h3 { margin: 0 0 6px 0; font-size: 20px; }
+    .web-placeholder p { margin: 0; max-width: 420px; font-size: 13px; line-height: 1.5; opacity: 0.86; }
+    .web-placeholder a { color: white; text-decoration: none; }
+    .web-launch-card { width: min(460px, 100%); display: grid; gap: 12px; justify-items: center; }
+    .web-launch-url { width: 100%; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 10px; background: rgba(255,255,255,0.1); color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
+    .web-launch-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .web-viewport.launcher-mode iframe { display: none; }
+    .youtube-skin .web-viewport { background: #120606; }
+    .youtube-skin .web-placeholder { background: linear-gradient(135deg, #170707, #b01824); }
+    .spotify-skin .web-viewport { background: #07120b; }
+    .spotify-skin .web-placeholder { background: linear-gradient(135deg, #08130c, #1db954); color: #f7fff9; }
+    body.night-mode .web-tile { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+    body.night-mode .web-tile:hover { background: rgba(46, 204, 113, 0.18); }
+
+    /* Soft Tech Apps */
+    .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 10px; }
+    .app-card { border: 1px solid rgba(36,49,58,0.08); border-radius: 8px; padding: 12px; background: rgba(255,255,255,0.62); color: inherit; font: inherit; cursor: pointer; display: grid; gap: 6px; text-align: left; transition: 0.18s; }
+    .app-card:hover { transform: translateY(-2px); border-color: var(--accent); background: white; }
+    .app-card span { font-size: 24px; }
+    .app-card strong { font-size: 14px; }
+    .app-card small { color: rgba(36,49,58,0.7); line-height: 1.35; }
+    body.night-mode .app-card { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); }
+    body.night-mode .app-card small { color: rgba(237,247,247,0.68); }
+    .ai-app { height: 100%; display: grid; grid-template-rows: 1fr auto auto; gap: 10px; }
+    .ai-log { overflow: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+    .ai-msg { max-width: 86%; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,0.76); border: 1px solid rgba(36,49,58,0.08); line-height: 1.45; font-size: 14px; }
+    .ai-msg.user { align-self: flex-end; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; }
+    .ai-quick { display: flex; gap: 8px; flex-wrap: wrap; }
+    .focus-panel { height: 100%; display: grid; place-items: center; text-align: center; gap: 14px; }
+    .focus-time { font-size: 54px; font-weight: 800; letter-spacing: 0; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .focus-modes, .focus-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .focus-modes .btn { background: rgba(76,111,255,0.12); color: var(--accent-2); }
+    .code-app { height: 100%; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr); gap: 10px; }
+    .code-app textarea { height: 100%; resize: none; font-family: "Fira Code", Consolas, monospace; font-size: 13px; }
+    .code-side { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+    .code-preview { flex: 1; border: 1px solid rgba(36,49,58,0.12); border-radius: 8px; background: white; overflow: hidden; }
+    .code-preview iframe { width: 100%; height: 100%; border: 0; background: white; }
+    .mini-stat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mini-stat div { border-radius: 8px; padding: 10px; background: rgba(255,255,255,0.62); border: 1px solid rgba(36,49,58,0.08); }
+    .mini-stat strong { display:block; color: var(--accent); font-size: 20px; }
+    .todo-row { display:flex; gap:8px; margin-bottom:10px; }
+    .todo-list { display:grid; gap:8px; }
+    .todo-item { display:flex; align-items:center; gap:8px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.62); border:1px solid rgba(36,49,58,0.08); }
+    .todo-item.done span { text-decoration: line-through; opacity:0.58; }
+
+    @media (max-width: 700px) {
+      .icons-area { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 12px; max-width: 100%; padding: 12px 12px 70px; }
+      .app-icon-bg { width: 52px; height: 52px; border-radius: 14px; }
+      .app-icon span { font-size: 12px; }
+      .window { min-width: 0; max-width: calc(100vw - 16px); max-height: calc(100vh - 72px); left: 8px !important; top: 8px !important; }
+      .window[style] { width: calc(100vw - 16px) !important; height: min(560px, calc(100vh - 72px)) !important; }
+      .win-body { padding: 10px; }
+      .web-toolbar { gap: 6px; }
+      .web-toolbar .btn { min-width: 34px; padding: 8px; }
+      .web-input { min-width: 140px; height: 36px; }
+      .web-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .web-tile { padding: 8px; }
+      .web-viewport { min-height: 220px; }
+      .start-menu { width: min(280px, calc(100vw - 20px)); }
+      .taskbar { height: 56px; }
+      .clock { font-size: 12px; }
+      .code-app { grid-template-columns: 1fr; }
+      .mini-stat { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 420px) {
+      .web-actions { grid-template-columns: 1fr; }
+      .task-item { padding: 8px 10px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    }
+
   </style>
 </head>
 <body>
@@ -187,6 +280,7 @@
       <div id="login-msg" style="margin-top: 15px; opacity: 0.8; font-weight: 500;">Bem-vindo ao TheoOS</div>
       <form id="login-form">
         <input type="password" class="login-input" id="pass-input" placeholder="senha (theo)" autocomplete="off">
+        <button type="submit" class="btn" id="login-submit" style="display:block; margin:18px auto 0;">Entrar</button>
       </form>
     </div>
   </div>
@@ -200,14 +294,19 @@
 
         <!-- 1. CHANGELOG -->
         <div class="window" id="win-changelog" style="width: 450px; height: 500px; left: 50px; top: 50px;">
-            <div class="titlebar"><div class="win-title">📜 Changelog 3.1</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-changelog')"></button></div></div>
+            <div class="titlebar"><div class="win-title">📜 Changelog 4.1</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-changelog')"></button></div></div>
             <div class="win-body">
-                <h3>TheoOS Pro 3.1 — Green Edition</h3>
+                <h3>TheoOS 4.1 — Soft Tech Edition</h3>
                 <ul style="padding-left: 20px; line-height: 1.6;">
-                    <li><b>🌿 Tema Verde:</b> Interface totalmente renovada com cores da natureza.</li>
-                    <li><b>💾 Conteúdo Original:</b> Músicas, história e textos restaurados.</li>
-                    <li><b>🎬 Boot Screen:</b> Adicionado suporte a vídeo de boot (boot.mp4).</li>
-                    <li><b>🎮 Jogo Corrigido:</b> Catch Hearts agora funciona perfeitamente.</li>
+                    <li><b>🌐 TheoWeb corrigido:</b> Sites que bloqueiam janela interna agora abrem em aba normal, sem tela quebrada.</li>
+                    <li><b>🚀 App Center:</b> Hub de sites legais com ChatGPT, GitHub, Canva, Discord, WhatsApp e mais.</li>
+                    <li><b>🤖 TheoAI:</b> Assistente local rápido para ideias, frases e organização.</li>
+                    <li><b>⏱️ Focus:</b> Timer de foco com modos de trabalho e pausa.</li>
+                    <li><b>💻 CodePad:</b> Mini laboratório de HTML/CSS/JS com preview.</li>
+                    <li><b>✅ Flow:</b> Lista de tarefas leve e salva no navegador.</li>
+                    <li><b>▶️ YouTube:</b> Player dedicado para links de vídeo e busca direta.</li>
+                    <li><b>🎧 Spotify:</b> Player dedicado para músicas, álbuns e playlists por link.</li>
+                    <li><b>✨ Visual:</b> Sistema mais soft, tech e limpo.</li>
                 </ul>
             </div>
         </div>
@@ -289,6 +388,205 @@
             </div>
         </div>
 
+        <!-- 9. NAVEGADOR -->
+        <div class="window" id="win-browser" style="width: 780px; height: 540px; left: 90px; top: 70px;">
+            <div class="titlebar"><div class="win-title">🌐 TheoWeb</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-browser')"></button></div></div>
+            <div class="win-body">
+                <div class="web-app">
+                    <div class="web-toolbar">
+                        <button class="btn" id="browser-back" title="Voltar">←</button>
+                        <button class="btn" id="browser-forward" title="Avançar">→</button>
+                        <button class="btn" id="browser-home" title="Início">⌂</button>
+                        <input class="web-input" id="browser-url" type="text" placeholder="Digite um site ou uma busca">
+                        <button class="btn" id="browser-go">Abrir</button>
+                        <button class="btn" id="browser-open-external" title="Abrir novamente">↗</button>
+                    </div>
+                    <div class="web-actions">
+                        <button class="web-tile" data-web-url="https://www.google.com/search?q=TheoOS"><span>🔎</span><strong>Google</strong></button>
+                        <button class="web-tile" data-web-url="https://www.youtube.com"><span>▶️</span><strong>YouTube</strong></button>
+                        <button class="web-tile" data-web-url="https://open.spotify.com"><span>🎧</span><strong>Spotify</strong></button>
+                        <button class="web-tile" data-web-url="https://web.whatsapp.com"><span>💬</span><strong>WhatsApp</strong></button>
+                        <button class="web-tile" data-web-url="https://discord.com/app"><span>🎙️</span><strong>Discord</strong></button>
+                        <button class="web-tile" data-web-url="https://www.canva.com"><span>🎨</span><strong>Canva</strong></button>
+                    </div>
+                    <div class="web-viewport launcher-mode" id="browser-viewport">
+                        <iframe id="browser-frame" title="TheoWeb"></iframe>
+                        <div class="web-placeholder" id="browser-placeholder">
+                            <div class="web-launch-card">
+                                <h3 id="browser-status-title">🌐 TheoWeb 4.1</h3>
+                                <p id="browser-status-text">Sites grandes como Google, YouTube e Spotify bloqueiam janela interna. O TheoWeb agora abre tudo em aba normal e mantém o controle aqui.</p>
+                                <div class="web-launch-url" id="browser-status-url">Pronto para navegar</div>
+                                <div class="web-launch-row">
+                                    <button class="btn" id="browser-reopen">Abrir site</button>
+                                    <button class="btn" style="background:var(--accent-2)" onclick="UI.openWin('win-appcenter')">App Center</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. YOUTUBE -->
+        <div class="window" id="win-youtube" style="width: 760px; height: 520px; left: 120px; top: 90px;">
+            <div class="titlebar"><div class="win-title">▶️ YouTube</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-youtube')"></button></div></div>
+            <div class="win-body">
+                <div class="web-app youtube-skin">
+                    <div class="web-toolbar">
+                        <input class="web-input" id="youtube-input" type="text" placeholder="Cole um link de vídeo ou escreva uma busca">
+                        <button class="btn" id="youtube-play">Assistir</button>
+                        <button class="btn" id="youtube-search">Buscar</button>
+                        <button class="btn" id="youtube-open" title="Abrir YouTube">↗</button>
+                    </div>
+                    <div class="web-actions">
+                        <button class="web-tile" data-youtube-query="lofi para programar"><span>🎧</span><strong>Lo-fi</strong></button>
+                        <button class="web-tile" data-youtube-query="games brasileiros"><span>🎮</span><strong>Games</strong></button>
+                        <button class="web-tile" data-youtube-query="musicas mais tocadas hoje"><span>🔥</span><strong>Em alta</strong></button>
+                        <button class="web-tile" data-youtube-query="aulas de tecnologia"><span>💡</span><strong>Tech</strong></button>
+                    </div>
+                    <div class="web-viewport">
+                        <iframe id="youtube-frame" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <div class="web-placeholder" id="youtube-placeholder">
+                            <div>
+                                <h3>▶️ YouTube no TheoOS</h3>
+                                <p>Cole um link de vídeo para assistir aqui ou use Buscar para abrir resultados.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. SPOTIFY -->
+        <div class="window" id="win-spotify" style="width: 560px; height: 500px; left: 150px; top: 110px;">
+            <div class="titlebar"><div class="win-title">🎧 Spotify</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-spotify')"></button></div></div>
+            <div class="win-body">
+                <div class="web-app spotify-skin">
+                    <div class="web-toolbar">
+                        <input class="web-input" id="spotify-input" type="text" placeholder="Cole link de música, álbum, artista ou playlist">
+                        <button class="btn" id="spotify-play">Tocar</button>
+                        <button class="btn" id="spotify-open" title="Abrir Spotify">↗</button>
+                    </div>
+                    <div class="web-actions">
+                        <button class="web-tile" data-spotify-url="https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M"><span>🔥</span><strong>Top Hits</strong></button>
+                        <button class="web-tile" data-spotify-url="https://open.spotify.com/playlist/37i9dQZF1DX4WYpdgoIcn6"><span>🌙</span><strong>Chill</strong></button>
+                        <button class="web-tile" data-spotify-url="https://open.spotify.com/playlist/37i9dQZF1DX0XUsuxWHRQd"><span>🎤</span><strong>Rap</strong></button>
+                    </div>
+                    <div class="web-viewport">
+                        <iframe id="spotify-frame" title="Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                        <div class="web-placeholder" id="spotify-placeholder">
+                            <div>
+                                <h3>🎧 Spotify no TheoOS</h3>
+                                <p>Cole um link do Spotify ou toque uma das playlists rápidas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12. APP CENTER -->
+        <div class="window" id="win-appcenter" style="width: 620px; height: 500px; left: 180px; top: 80px;">
+            <div class="titlebar"><div class="win-title">🚀 App Center</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-appcenter')"></button></div></div>
+            <div class="win-body">
+                <p style="margin-top:0;">Sites abrem em aba normal para não bater no bloqueio de iframe.</p>
+                <div class="app-grid">
+                    <button class="app-card" data-launch-url="https://chatgpt.com"><span>✨</span><strong>ChatGPT</strong><small>Ideias, estudo e código</small></button>
+                    <button class="app-card" data-launch-url="https://github.com"><span>🐙</span><strong>GitHub</strong><small>Projetos e repositórios</small></button>
+                    <button class="app-card" data-launch-url="https://www.google.com"><span>🔎</span><strong>Google</strong><small>Pesquisa rápida</small></button>
+                    <button class="app-card" data-launch-url="https://www.youtube.com"><span>▶️</span><strong>YouTube</strong><small>Vídeos e música</small></button>
+                    <button class="app-card" data-launch-url="https://open.spotify.com"><span>🎧</span><strong>Spotify</strong><small>Player web</small></button>
+                    <button class="app-card" data-launch-url="https://www.canva.com"><span>🎨</span><strong>Canva</strong><small>Design e posts</small></button>
+                    <button class="app-card" data-launch-url="https://discord.com/app"><span>🎙️</span><strong>Discord</strong><small>Comunidades</small></button>
+                    <button class="app-card" data-launch-url="https://web.whatsapp.com"><span>💬</span><strong>WhatsApp</strong><small>Mensagens</small></button>
+                    <button class="app-card" data-launch-url="https://www.figma.com"><span>🧩</span><strong>Figma</strong><small>UI e protótipos</small></button>
+                    <button class="app-card" data-launch-url="https://www.notion.so"><span>📚</span><strong>Notion</strong><small>Notas e organização</small></button>
+                    <button class="app-card" data-launch-url="https://www.roblox.com"><span>🕹️</span><strong>Roblox</strong><small>Jogos</small></button>
+                    <button class="app-card" data-launch-url="https://www.netflix.com"><span>🎬</span><strong>Netflix</strong><small>Filmes e séries</small></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13. THEO AI -->
+        <div class="window" id="win-ai" style="width: 480px; height: 520px; left: 210px; top: 95px;">
+            <div class="titlebar"><div class="win-title">🤖 TheoAI</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-ai')"></button></div></div>
+            <div class="win-body">
+                <div class="ai-app">
+                    <div class="ai-log" id="ai-log">
+                        <div class="ai-msg">Oi, eu sou o TheoAI local. Posso sugerir ideias, organizar tarefas e deixar o TheoOS com vibe tech.</div>
+                    </div>
+                    <div class="ai-quick">
+                        <button class="btn" data-ai-prompt="me dá ideias de apps">Ideias</button>
+                        <button class="btn" data-ai-prompt="organiza meu dia">Meu dia</button>
+                        <button class="btn" data-ai-prompt="frase motivacional">Frase</button>
+                    </div>
+                    <div class="web-toolbar">
+                        <input class="web-input" id="ai-input" type="text" placeholder="Pergunte algo para o TheoAI">
+                        <button class="btn" id="ai-send">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14. FOCUS -->
+        <div class="window" id="win-focus" style="width: 380px; height: 380px; left: 240px; top: 120px;">
+            <div class="titlebar"><div class="win-title">⏱️ Focus</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-focus')"></button></div></div>
+            <div class="win-body">
+                <div class="focus-panel">
+                    <div>
+                        <p id="focus-label" style="margin:0 0 8px;">Modo foco</p>
+                        <div class="focus-time" id="focus-time">25:00</div>
+                    </div>
+                    <div class="focus-modes">
+                        <button class="btn" data-focus-min="25">Foco</button>
+                        <button class="btn" data-focus-min="5">Pausa</button>
+                        <button class="btn" data-focus-min="15">Longa</button>
+                    </div>
+                    <div class="focus-controls">
+                        <button class="btn" id="focus-start">Iniciar</button>
+                        <button class="btn" id="focus-reset" style="background:var(--accent-2)">Reset</button>
+                    </div>
+                    <p style="font-size:12px; opacity:.72;">Perfeito para estudar, codar ou só colocar ordem na mente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15. CODEPAD -->
+        <div class="window" id="win-codepad" style="width: 760px; height: 520px; left: 120px; top: 80px;">
+            <div class="titlebar"><div class="win-title">💻 CodePad</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-codepad')"></button></div></div>
+            <div class="win-body">
+                <div class="code-app">
+                    <div class="code-side">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn" id="code-run">Rodar</button>
+                            <button class="btn" id="code-reset" style="background:var(--accent-2)">Modelo</button>
+                        </div>
+                        <textarea id="code-editor" spellcheck="false"></textarea>
+                    </div>
+                    <div class="code-side">
+                        <div class="mini-stat">
+                            <div><strong id="code-lines">0</strong><small>linhas</small></div>
+                            <div><strong id="code-chars">0</strong><small>chars</small></div>
+                            <div><strong>Live</strong><small>preview</small></div>
+                        </div>
+                        <div class="code-preview"><iframe id="code-preview" title="CodePad Preview" sandbox="allow-scripts"></iframe></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16. FLOW -->
+        <div class="window" id="win-flow" style="width: 380px; height: 420px; left: 270px; top: 130px;">
+            <div class="titlebar"><div class="win-title">✅ Flow</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-flow')"></button></div></div>
+            <div class="win-body">
+                <div class="todo-row">
+                    <input id="flow-input" type="text" placeholder="Nova tarefa">
+                    <button class="btn" id="flow-add">Add</button>
+                </div>
+                <div class="todo-list" id="flow-list"></div>
+            </div>
+        </div>
+
         <!-- 9. AVENTURA (RPG) -->
         <div class="window" id="win-adventure" style="width: 500px; height: 400px;">
             <div class="titlebar"><div class="win-title">⚔️ Pequenas Aventuras</div><div class="win-controls"><button class="btn-close" onclick="closeWin('win-adventure')"></button></div></div>
@@ -336,12 +634,13 @@
 
                 <p style="font-weight:bold; margin-bottom:5px;">Papel de Parede:</p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn" onclick="UI.setWallpaper('verde_azul')">Verde e Azul (Original)</button>
+                    <button class="btn" style="background:var(--accent-2)" onclick="UI.setWallpaper('soft_tech')">Soft Tech</button>
+                    <button class="btn" onclick="UI.setWallpaper('verde_azul')">Leader Theme</button>
                     <button class="btn" style="background:#ff9ff3; color:#2d3436;" onclick="UI.setWallpaper('amor_rosa')">Amor Rosa</button>
-                    <button class="btn" style="background:#00b894" onclick="UI.setWallpaper('default')">Green Pro</button>
+                    <button class="btn" style="background:#b62b2b" onclick="UI.setWallpaper('adult_red')">Adult Red</button>
                 </div>
                 
-                <p style="margin-top:20px; font-size:12px; color:gray;">TheoOS v3.1 Pro<br>Heart Kernel Active</p>
+                <p style="margin-top:20px; font-size:12px; color:gray;">TheoOS v4.1 Soft Tech<br>Heart Kernel + Web Suite Active</p>
             </div>
         </div>
         
@@ -394,6 +693,14 @@
         { id: 'win-notes', name: 'Cartas', icon: '📝' },
         { id: 'win-gallery', name: 'Fotos', icon: '📸' },
         { id: 'win-music', name: 'Música', icon: '🎵' },
+        { id: 'win-browser', name: 'TheoWeb', icon: '🌐' },
+        { id: 'win-youtube', name: 'YouTube', icon: '▶️' },
+        { id: 'win-spotify', name: 'Spotify', icon: '🎧' },
+        { id: 'win-appcenter', name: 'App Center', icon: '🚀' },
+        { id: 'win-ai', name: 'TheoAI', icon: '🤖' },
+        { id: 'win-focus', name: 'Focus', icon: '⏱️' },
+        { id: 'win-codepad', name: 'CodePad', icon: '💻' },
+        { id: 'win-flow', name: 'Flow', icon: '✅' },
         { id: 'win-paint', name: 'Desenho', icon: '🎨' },
         { id: 'win-calc', name: 'Calculadora', icon: '🧮' },
         { id: 'win-term', name: 'Terminal', icon: '💬' },
@@ -408,7 +715,7 @@
     ];
 
     const Kernel = {
-        data: { boots: 0, theme: 'auto', wallpaper: 'default', notes: '', dreams: '', photos: [] },
+        data: { boots: 0, theme: 'auto', wallpaper: 'soft_tech', notes: '', dreams: '', photos: [] },
         init() {
             const saved = localStorage.getItem('theoos_pro_31');
             if (saved) this.data = { ...this.data, ...JSON.parse(saved) };
@@ -433,8 +740,10 @@
         applyWallpaper() {
              const wp = this.data.wallpaper;
              const el = $('#wallpaper');
-             if(wp === 'verde_azul') el.style.background = 'radial-gradient(1200px 700px at 60% 110%, #b8f7c3 0%, #a8e9f0 55%, #c9d8ff 100%)';
+             if(wp === 'soft_tech') el.style.background = 'url("wallpaper3.jpg") center/cover';
+             else if(wp === 'verde_azul') el.style.background = 'url("wallpaper1.jpg") center/cover';
              else if(wp === 'amor_rosa') el.style.background = 'url("wallpaper2.jpg") center/cover';
+             else if(wp === 'adult_red' || wp === 'default') el.style.background = 'url("wallpaper4.png") center/cover';
              else el.style.background = 'var(--bg-grad)';
         }
     };
@@ -472,6 +781,7 @@
         zTop: 100,
         
         init() {
+            $$('.window').forEach(win => { win.style.display = 'none'; });
             this.renderIcons();
             this.renderStart();
             setInterval(() => $('#clock').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 1000);
@@ -813,6 +1123,311 @@
     };
     MusicApp.init(); // Setup defaults
 
+    // 8. WEB SUITE
+    const WebSuite = {
+        browserHistory: [],
+        browserIndex: -1,
+        lastBrowserUrl: '',
+        init() {
+            this.bind('#browser-go', 'click', () => this.navigateBrowser($('#browser-url').value));
+            this.bind('#browser-url', 'keydown', e => { if(e.key === 'Enter') this.navigateBrowser(e.target.value); });
+            this.bind('#browser-home', 'click', () => this.browserHome());
+            this.bind('#browser-back', 'click', () => this.browserStep(-1));
+            this.bind('#browser-forward', 'click', () => this.browserStep(1));
+            this.bind('#browser-open-external', 'click', () => this.openExternal(this.lastBrowserUrl || $('#browser-url').value || 'https://www.google.com'));
+            this.bind('#browser-reopen', 'click', () => this.openExternal(this.lastBrowserUrl || $('#browser-url').value || 'https://www.google.com'));
+
+            this.bind('#youtube-play', 'click', () => this.playYouTube($('#youtube-input').value));
+            this.bind('#youtube-input', 'keydown', e => { if(e.key === 'Enter') this.playYouTube(e.target.value); });
+            this.bind('#youtube-search', 'click', () => this.searchYouTube($('#youtube-input').value));
+            this.bind('#youtube-open', 'click', () => this.openExternal('https://www.youtube.com'));
+
+            this.bind('#spotify-play', 'click', () => this.playSpotify($('#spotify-input').value));
+            this.bind('#spotify-input', 'keydown', e => { if(e.key === 'Enter') this.playSpotify(e.target.value); });
+            this.bind('#spotify-open', 'click', () => this.openExternal('https://open.spotify.com'));
+
+            $$('.web-tile[data-web-url]').forEach(tile => {
+                tile.onclick = () => this.navigateBrowser(tile.dataset.webUrl);
+            });
+            $$('.app-card[data-launch-url]').forEach(tile => {
+                tile.onclick = () => this.launchApp(tile.dataset.launchUrl, tile.querySelector('strong')?.innerText || 'App');
+            });
+            $$('.web-tile[data-youtube-query]').forEach(tile => {
+                tile.onclick = () => {
+                    $('#youtube-input').value = tile.dataset.youtubeQuery;
+                    this.searchYouTube(tile.dataset.youtubeQuery);
+                };
+            });
+            $$('.web-tile[data-spotify-url]').forEach(tile => {
+                tile.onclick = () => {
+                    $('#spotify-input').value = tile.dataset.spotifyUrl;
+                    this.playSpotify(tile.dataset.spotifyUrl);
+                };
+            });
+        },
+        bind(selector, eventName, fn) {
+            const el = $(selector);
+            if(el) el.addEventListener(eventName, fn);
+        },
+        normalizeAddress(raw) {
+            const value = (raw || '').trim();
+            if(!value) return '';
+            if(/^https?:\/\//i.test(value)) return value;
+            if(/^[\w.-]+\.[a-z]{2,}([/?#].*)?$/i.test(value)) return `https://${value}`;
+            return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+        },
+        navigateBrowser(raw, pushHistory = true) {
+            const url = this.normalizeAddress(raw);
+            if(!url) return;
+            this.lastBrowserUrl = url;
+            $('#browser-url').value = url;
+            $('#browser-frame').src = 'about:blank';
+            this.showBrowserStatus('Abrindo em aba normal', 'Esse site pode bloquear janela interna, então o TheoWeb abriu fora para funcionar de verdade.', url);
+            this.openExternal(url);
+            if(pushHistory) {
+                this.browserHistory = this.browserHistory.slice(0, this.browserIndex + 1);
+                this.browserHistory.push(url);
+                this.browserIndex = this.browserHistory.length - 1;
+            }
+        },
+        browserHome() {
+            $('#browser-frame').src = 'about:blank';
+            $('#browser-url').value = '';
+            this.showBrowserStatus('🌐 TheoWeb 4.1', 'Digite um site ou busca. O TheoWeb abre em aba normal para evitar bloqueios de iframe.', 'Pronto para navegar');
+            this.lastBrowserUrl = '';
+        },
+        browserStep(step) {
+            const nextIndex = this.browserIndex + step;
+            if(nextIndex < 0 || nextIndex >= this.browserHistory.length) return;
+            this.browserIndex = nextIndex;
+            this.navigateBrowser(this.browserHistory[this.browserIndex], false);
+        },
+        openExternal(raw) {
+            const url = this.normalizeAddress(raw);
+            if(url) window.open(url, '_blank', 'noopener,noreferrer');
+        },
+        launchApp(raw, name = 'App') {
+            const url = this.normalizeAddress(raw);
+            if(!url) return;
+            this.lastBrowserUrl = url;
+            $('#browser-url').value = url;
+            this.showBrowserStatus(`${name} aberto`, 'Abri em uma aba normal para o site carregar completo.', url);
+            this.openExternal(url);
+        },
+        showBrowserStatus(title, text, url) {
+            $('#browser-viewport').classList.add('launcher-mode');
+            $('#browser-placeholder').style.display = 'grid';
+            $('#browser-status-title').innerText = title;
+            $('#browser-status-text').innerText = text;
+            $('#browser-status-url').innerText = url;
+        },
+        parseYouTubeVideo(raw) {
+            const value = (raw || '').trim();
+            if(/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
+            if(!value) return null;
+            try {
+                const url = new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`);
+                const host = url.hostname.replace('www.', '');
+                if(host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || null;
+                if(host.includes('youtube.com')) {
+                    if(url.pathname === '/watch') return url.searchParams.get('v');
+                    const parts = url.pathname.split('/').filter(Boolean);
+                    if(['embed', 'shorts', 'live'].includes(parts[0])) return parts[1] || null;
+                }
+            } catch {}
+            return null;
+        },
+        playYouTube(raw) {
+            const videoId = this.parseYouTubeVideo(raw);
+            if(!videoId) {
+                this.searchYouTube(raw);
+                return;
+            }
+            $('#youtube-placeholder').style.display = 'none';
+            $('#youtube-frame').src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        },
+        searchYouTube(raw) {
+            const query = (raw || 'youtube').trim();
+            this.openExternal(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`);
+        },
+        parseSpotify(raw) {
+            const value = (raw || '').trim();
+            if(!value || !/^https?:\/\//i.test(value)) return null;
+            try {
+                const url = new URL(value);
+                if(!url.hostname.includes('spotify.com')) return null;
+                const parts = url.pathname.split('/').filter(Boolean);
+                if(parts[0] === 'embed') parts.shift();
+                const [type, id] = parts;
+                const allowed = ['track', 'album', 'artist', 'playlist', 'episode', 'show'];
+                if(!allowed.includes(type) || !id) return null;
+                return { type, id };
+            } catch {}
+            return null;
+        },
+        playSpotify(raw) {
+            const embed = this.parseSpotify(raw);
+            if(!embed) {
+                const query = (raw || 'spotify').trim();
+                this.openExternal(`https://open.spotify.com/search/${encodeURIComponent(query)}`);
+                return;
+            }
+            $('#spotify-placeholder').style.display = 'none';
+            $('#spotify-frame').src = `https://open.spotify.com/embed/${embed.type}/${embed.id}?utm_source=generator`;
+        }
+    };
+
+    // 9. SOFT TECH APPS
+    const AIApp = {
+        init() {
+            this.bind('#ai-send', 'click', () => this.send($('#ai-input').value));
+            this.bind('#ai-input', 'keydown', e => { if(e.key === 'Enter') this.send(e.target.value); });
+            $$('[data-ai-prompt]').forEach(btn => btn.onclick = () => this.send(btn.dataset.aiPrompt));
+        },
+        bind(selector, eventName, fn) {
+            const el = $(selector);
+            if(el) el.addEventListener(eventName, fn);
+        },
+        add(text, who = 'bot') {
+            const log = $('#ai-log');
+            const div = document.createElement('div');
+            div.className = `ai-msg ${who === 'user' ? 'user' : ''}`;
+            div.innerText = text;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        },
+        send(raw) {
+            const text = (raw || '').trim();
+            if(!text) return;
+            $('#ai-input').value = '';
+            this.add(text, 'user');
+            const lower = text.toLowerCase();
+            let reply = 'Boa. Eu começaria com uma versão pequena, testaria, e depois deixaria bonito. No TheoOS, isso quase sempre vira um app novo.';
+            if(lower.includes('ideia') || lower.includes('apps')) reply = 'Ideias boas para o TheoOS: player de rádio, calendário, dashboard de estudos, editor de avatar, loja de temas, mini chat e gerador de wallpapers.';
+            else if(lower.includes('dia') || lower.includes('organiza')) reply = 'Plano rápido: 1 tarefa grande, 2 tarefas médias, 3 pequenas. Liga o Focus por 25 min, fecha distrações e marca no Flow quando terminar.';
+            else if(lower.includes('frase') || lower.includes('motiv')) reply = 'Frase do sistema: devagar também compila. Continua construindo.';
+            else if(lower.includes('site') || lower.includes('google')) reply = 'Sites como Google bloqueiam iframe. Usa o App Center ou TheoWeb: eles abrem em aba normal, que é o jeito certo.';
+            setTimeout(() => this.add(reply), 180);
+        }
+    };
+
+    const FocusApp = {
+        seconds: 25 * 60,
+        initialSeconds: 25 * 60,
+        timer: null,
+        running: false,
+        init() {
+            $$('[data-focus-min]').forEach(btn => btn.onclick = () => this.setMode(Number(btn.dataset.focusMin)));
+            $('#focus-start').onclick = () => this.toggle();
+            $('#focus-reset').onclick = () => this.reset();
+            this.render();
+        },
+        setMode(minutes) {
+            this.initialSeconds = minutes * 60;
+            this.seconds = this.initialSeconds;
+            $('#focus-label').innerText = minutes === 25 ? 'Modo foco' : 'Modo pausa';
+            this.stop();
+            this.render();
+        },
+        toggle() {
+            this.running ? this.stop() : this.start();
+        },
+        start() {
+            if(this.running) return;
+            this.running = true;
+            $('#focus-start').innerText = 'Pausar';
+            this.timer = setInterval(() => {
+                this.seconds = Math.max(0, this.seconds - 1);
+                this.render();
+                if(this.seconds === 0) this.stop();
+            }, 1000);
+        },
+        stop() {
+            this.running = false;
+            $('#focus-start').innerText = 'Iniciar';
+            clearInterval(this.timer);
+        },
+        reset() {
+            this.stop();
+            this.seconds = this.initialSeconds;
+            this.render();
+        },
+        render() {
+            const m = String(Math.floor(this.seconds / 60)).padStart(2, '0');
+            const s = String(this.seconds % 60).padStart(2, '0');
+            $('#focus-time').innerText = `${m}:${s}`;
+        }
+    };
+
+    const CodePadApp = {
+        sample: `<main>\n  <h1>TheoOS Lab</h1>\n  <p>Crie uma ideia e clique em Rodar.</p>\n  <button onclick=\"document.body.classList.toggle('glow')\">Alternar glow</button>\n</main>\n<style>\n  body { font-family: system-ui; display: grid; place-items: center; min-height: 100vh; margin: 0; background: #eefbff; color: #24313a; }\n  main { text-align: center; padding: 28px; border-radius: 14px; background: white; box-shadow: 0 16px 40px #b9d8e8; }\n  button { border: 0; border-radius: 8px; padding: 10px 14px; background: #00a8a8; color: white; }\n  .glow main { box-shadow: 0 0 40px #00a8a8; }\n</style>`,
+        init() {
+            $('#code-run').onclick = () => this.run();
+            $('#code-reset').onclick = () => { $('#code-editor').value = this.sample; this.run(); };
+            $('#code-editor').oninput = () => this.updateStats();
+            if(!$('#code-editor').value) $('#code-editor').value = localStorage.getItem('theo_codepad') || this.sample;
+            this.run();
+        },
+        run() {
+            const code = $('#code-editor').value;
+            localStorage.setItem('theo_codepad', code);
+            $('#code-preview').srcdoc = code;
+            this.updateStats();
+        },
+        updateStats() {
+            const code = $('#code-editor').value;
+            $('#code-lines').innerText = code.split('\n').length;
+            $('#code-chars').innerText = code.length;
+        }
+    };
+
+    const FlowApp = {
+        items: [],
+        init() {
+            this.items = JSON.parse(localStorage.getItem('theo_flow') || '[]');
+            $('#flow-add').onclick = () => this.add($('#flow-input').value);
+            $('#flow-input').onkeydown = e => { if(e.key === 'Enter') this.add(e.target.value); };
+            this.render();
+        },
+        save() { localStorage.setItem('theo_flow', JSON.stringify(this.items)); },
+        add(text) {
+            const value = (text || '').trim();
+            if(!value) return;
+            this.items.push({ id: Date.now() + Math.random(), text: value, done: false });
+            $('#flow-input').value = '';
+            this.save();
+            this.render();
+        },
+        toggle(id) {
+            const item = this.items.find(i => i.id === id);
+            if(item) item.done = !item.done;
+            this.save();
+            this.render();
+        },
+        remove(id) {
+            this.items = this.items.filter(i => i.id !== id);
+            this.save();
+            this.render();
+        },
+        render() {
+            const list = $('#flow-list');
+            list.innerHTML = '';
+            if(this.items.length === 0) {
+                list.innerHTML = '<div class="todo-item"><span>Sem tarefas por enquanto. Adiciona uma missão.</span></div>';
+                return;
+            }
+            this.items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = `todo-item ${item.done ? 'done' : ''}`;
+                row.innerHTML = `<input type="checkbox" ${item.done ? 'checked' : ''}><span style="flex:1"></span><button class="btn" style="padding:6px 10px;background:#ff6b8b">x</button>`;
+                row.querySelector('span').innerText = item.text;
+                row.querySelector('input').onchange = () => this.toggle(item.id);
+                row.querySelector('button').onclick = () => this.remove(item.id);
+                list.appendChild(row);
+            });
+        }
+    };
+
     // 8. ORACLE
     const OracleApp = {
         answers: ["Sim, com certeza!", "Talvez num sonho.", "Os astros dizem que sim.", "Pergunte mais tarde.", "Ame a si mesmo primeiro."],
@@ -840,10 +1455,18 @@
             
             print(`<span class="prompt">theo@amor:~$</span> ${val}`);
             
-            if(val === 'ajuda') print("Comandos: ajuda, oi, data, amor, limpar");
+            if(val === 'ajuda') print("Comandos: ajuda, oi, data, amor, navegador, appcenter, youtube, spotify, ai, focus, code, flow, limpar");
             else if(val === 'limpar') out.innerHTML = '';
             else if(val === 'data') print(new Date().toLocaleString('pt-BR'));
             else if(val === 'amor') print("Amor = 100%.");
+            else if(val === 'navegador' || val === 'web') { UI.openWin('win-browser'); print("Abrindo TheoWeb 4.1."); }
+            else if(val === 'appcenter' || val === 'apps') { UI.openWin('win-appcenter'); print("Abrindo App Center."); }
+            else if(val === 'youtube') { UI.openWin('win-youtube'); print("Abrindo YouTube."); }
+            else if(val === 'spotify') { UI.openWin('win-spotify'); print("Abrindo Spotify."); }
+            else if(val === 'ai' || val === 'theoai') { UI.openWin('win-ai'); print("Abrindo TheoAI."); }
+            else if(val === 'focus') { UI.openWin('win-focus'); print("Abrindo Focus."); }
+            else if(val === 'code' || val === 'codepad') { UI.openWin('win-codepad'); print("Abrindo CodePad."); }
+            else if(val === 'flow' || val === 'tarefas') { UI.openWin('win-flow'); print("Abrindo Flow."); }
             else if(val === 'oi') print("Oi, Theo! 💖");
             else print('Comando não encontrado.');
             
@@ -854,6 +1477,7 @@
     /* --- BOOTSTRAP --- */
     window.closeWin = UI.closeWin.bind(UI); 
     window.Boot = Boot; 
+    window.WebSuite = WebSuite;
 
     // Login Logic
     $('#heart-btn').onclick = () => { $('#pass-input').focus(); };
@@ -872,6 +1496,11 @@
     };
 
     // Init
+    WebSuite.init();
+    AIApp.init();
+    FocusApp.init();
+    CodePadApp.init();
+    FlowApp.init();
     Kernel.init();
     UI.init();
 
